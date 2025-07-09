@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { verifyToken } from '@/lib/auth'
 
 export function middleware(request: NextRequest) {
   const protectedPaths = ['/dashboard', '/preferences']
@@ -18,17 +17,14 @@ export function middleware(request: NextRequest) {
   }
 
   if (isAuthPath && token) {
-    try {
-      verifyToken(token)
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    } catch {
-      // Invalid token, continue to auth page
-    }
+    // Just check if token exists, don't verify in middleware
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/preferences/:path*', '/login', '/signup']
+  matcher: ['/dashboard/:path*', '/preferences/:path*', '/login', '/signup'],
+  runtime: 'nodejs'
 }
