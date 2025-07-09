@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
-import { encrypt, decrypt } from '@/lib/crypto'
+import { encrypt, decrypt } from '../lib/crypto'
 
 export interface IUser extends mongoose.Document {
   username: string
