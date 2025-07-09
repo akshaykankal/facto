@@ -25,6 +25,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/preferences/:path*', '/login', '/signup'],
-  runtime: 'nodejs'
+  matcher: ['/dashboard/:path*', '/preferences/:path*', '/login', '/signup']
 }
