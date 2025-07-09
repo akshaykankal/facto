@@ -20,7 +20,7 @@ export function verifyToken(token: string): TokenPayload {
   return jwt.verify(token, JWT_SECRET) as TokenPayload
 }
 
-export function getTokenFromHeaders(authHeader?: string): string | null {
+export function getTokenFromHeaders(authHeader: string | null): string | null {
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null
   }
