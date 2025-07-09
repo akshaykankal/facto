@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
     today.setHours(0, 0, 0, 0)
 
     const existingLog = user.attendanceLogs.find(
-      log => log.date.toDateString() === today.toDateString()
+      (log: any) => log.date.toDateString() === today.toDateString()
     )
 
     if (existingLog) {

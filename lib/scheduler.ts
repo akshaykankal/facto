@@ -74,14 +74,14 @@ export class AttendanceScheduler {
       // Check if today is a leave day
       const todayString = today.toISOString().split('T')[0]
       const isLeaveDay = user.preferences.leaveDates.some(
-        leaveDate => new Date(leaveDate).toISOString().split('T')[0] === todayString
+        (leaveDate: any) => new Date(leaveDate).toISOString().split('T')[0] === todayString
       )
 
       if (isLeaveDay) {
         console.log(`Skipping attendance for ${user.username} - on leave`)
         // Log as leave
         const existingLog = user.attendanceLogs.find(
-          log => log.date.toDateString() === today.toDateString()
+          (log: any) => log.date.toDateString() === today.toDateString()
         )
 
         if (!existingLog) {
@@ -108,7 +108,7 @@ export class AttendanceScheduler {
       // Log the attendance
       today.setHours(0, 0, 0, 0)
       const existingLog = user.attendanceLogs.find(
-        log => log.date.toDateString() === today.toDateString()
+        (log: any) => log.date.toDateString() === today.toDateString()
       )
 
       if (existingLog) {
