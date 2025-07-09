@@ -36,6 +36,8 @@ export default function Signup() {
       }
 
       localStorage.setItem('token', data.token)
+      // Set cookie for middleware
+      document.cookie = `token=${data.token}; path=/; max-age=604800` // 7 days
       router.push('/dashboard')
     } catch (err: any) {
       setError(err.message)
