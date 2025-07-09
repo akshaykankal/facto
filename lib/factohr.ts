@@ -32,19 +32,23 @@ export class FactoHRService {
         this.cookies = setCookieHeader.map(cookie => cookie.split(';')[0]).join('; ')
       }
 
+      // Prepare form data
+      const params = new URLSearchParams()
+      params.append('Username', credentials.username)
+      params.append('Password', credentials.password)
+      params.append('RememberMe', 'false')
+
       // Attempt to login
       const loginResponse = await axios.post(
         `${this.baseURL}/Security/Login`,
-        {
-          Username: credentials.username,
-          Password: credentials.password,
-          RememberMe: false,
-        },
+        params.toString(),
         {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Cookie': this.cookies,
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Referer': `${this.baseURL}/Security/Login`,
           },
           withCredentials: true,
           maxRedirects: 0,
@@ -63,8 +67,14 @@ export class FactoHRService {
       }
 
       return false
-    } catch (error) {
+    } catch (error: any) {
       console.error('FactoHR login error:', error)
+      console.error('Error details:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      })
       return false
     }
   }
@@ -136,25 +146,37 @@ export async function processAttendance(
   factohrPassword: string,
   action: 'punchIn' | 'punchOut'
 ): Promise<AttendanceResult> {
-  const service = new FactoHRService()
-  
-  // Login to FactoHR
-  const loginSuccess = await service.login({
-    username: factohrUsername,
-    password: factohrPassword, // Now expects the actual password, not hashed
-  })
+  try {
+    const service = new FactoHRService()
+    
+    console.log('Attempting to login to FactoHR for user:', factohrUsername)
+    
+    // Login to FactoHR
+    const loginSuccess = await service.login({
+      username: factohrUsername,
+      password: factohrPassword, // Now expects the actual password, not hashed
+    })
 
-  if (!loginSuccess) {
+    if (!loginSuccess) {
+      return {
+        success: false,
+        message: 'Failed to login to FactoHR. Please check your credentials.',
+      }
+    }
+
+    console.log('Login successful, marking attendance:', action)
+
+    // Mark attendance
+    if (action === 'punchIn') {
+      return service.markPunchIn()
+    } else {
+      return service.markPunchOut()
+    }
+  } catch (error: any) {
+    console.error('Process attendance error:', error)
     return {
       success: false,
-      message: 'Failed to login to FactoHR',
+      message: `Error: ${error.message || 'Unknown error occurred'}`,
     }
-  }
-
-  // Mark attendance
-  if (action === 'punchIn') {
-    return service.markPunchIn()
-  } else {
-    return service.markPunchOut()
   }
 }
