@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
+import { encrypt, decrypt } from '@/lib/crypto'
 
 export interface IUser extends mongoose.Document {
   username: string
@@ -23,6 +24,7 @@ export interface IUser extends mongoose.Document {
   createdAt: Date
   updatedAt: Date
   comparePassword(candidatePassword: string): Promise<boolean>
+  getDecryptedFactohrPassword(): string
 }
 
 const UserSchema = new mongoose.Schema({
@@ -101,8 +103,8 @@ UserSchema.pre('save', async function(next) {
   if (!this.isModified('factohrPassword')) return next()
   
   try {
-    const salt = await bcrypt.genSalt(10)
-    this.factohrPassword = await bcrypt.hash(this.factohrPassword, salt)
+    // Encrypt the factohrPassword instead of hashing it
+    this.factohrPassword = encrypt(this.factohrPassword)
     next()
   } catch (error: any) {
     next(error)
@@ -111,6 +113,10 @@ UserSchema.pre('save', async function(next) {
 
 UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
   return bcrypt.compare(candidatePassword, this.password)
+}
+
+UserSchema.methods.getDecryptedFactohrPassword = function(): string {
+  return decrypt(this.factohrPassword)
 }
 
 export default mongoose.models.User || mongoose.model<IUser>('User', UserSchema)

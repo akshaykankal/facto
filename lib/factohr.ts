@@ -133,7 +133,7 @@ export class FactoHRService {
 
 export async function processAttendance(
   factohrUsername: string,
-  factohrPasswordHash: string,
+  factohrPassword: string,
   action: 'punchIn' | 'punchOut'
 ): Promise<AttendanceResult> {
   const service = new FactoHRService()
@@ -141,7 +141,7 @@ export async function processAttendance(
   // Login to FactoHR
   const loginSuccess = await service.login({
     username: factohrUsername,
-    password: factohrPasswordHash, // Note: In production, this should be decrypted
+    password: factohrPassword, // Now expects the actual password, not hashed
   })
 
   if (!loginSuccess) {

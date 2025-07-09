@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     // Process attendance
     const result = await processAttendance(
       user.factohrUsername,
-      user.factohrPassword, // This is already hashed
+      user.getDecryptedFactohrPassword(), // Decrypt the password
       action
     )
 

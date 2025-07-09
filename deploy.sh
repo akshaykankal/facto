@@ -10,6 +10,7 @@ echo "FACTOHR" | vercel env add DB_NAME production
 echo "your-jwt-secret-key-change-in-production" | vercel env add JWT_SECRET production
 echo "https://factohr-automation.vercel.app" | vercel env add NEXTAUTH_URL production
 echo "your-nextauth-secret-change-in-production" | vercel env add NEXTAUTH_SECRET production
+echo "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6" | vercel env add ENCRYPTION_KEY production
 
 echo "Deploying to production..."
 vercel --prod --yes

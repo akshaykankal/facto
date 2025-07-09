@@ -95,7 +95,7 @@ export class AttendanceScheduler {
       console.log(`Processing ${action} for ${user.username}`)
       const result = await processAttendance(
         user.factohrUsername,
-        user.factohrPassword,
+        user.getDecryptedFactohrPassword(),
         action
       )
 

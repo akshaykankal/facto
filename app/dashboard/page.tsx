@@ -82,6 +82,35 @@ export default function Dashboard() {
     }
   }
 
+  const handleManualAttendance = async (action: 'punchIn' | 'punchOut') => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      const response = await fetch('/api/attendance/mark', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ action }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        alert(`${action === 'punchIn' ? 'Punch In' : 'Punch Out'} successful!`)
+        // Refresh logs
+        fetchLogs()
+      } else {
+        alert(`Failed: ${data.message || data.error}`)
+      }
+    } catch (error) {
+      console.error('Manual attendance error:', error)
+      alert('An error occurred. Please try again.')
+    }
+  }
+
   const handleLogout = () => {
     localStorage.removeItem('token')
     // Clear cookie
@@ -178,6 +207,29 @@ export default function Dashboard() {
                 >
                   Update Preferences
                 </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 bg-white overflow-hidden shadow rounded-lg">
+            <div className="px-4 py-5 sm:p-6">
+              <h2 className="text-lg font-medium text-gray-900 mb-4">Manual Attendance (For Testing)</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                Test your FactoHR integration by manually punching in or out.
+              </p>
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => handleManualAttendance('punchIn')}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  Test Punch In
+                </button>
+                <button
+                  onClick={() => handleManualAttendance('punchOut')}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Test Punch Out
+                </button>
               </div>
             </div>
           </div>
