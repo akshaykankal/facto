@@ -26,46 +26,66 @@ export class FactoHRService {
         withCredentials: true,
       })
 
-      // Extract cookies from response
+      // Extract cookies and request verification token from response
       const setCookieHeader = loginPageResponse.headers['set-cookie']
       if (setCookieHeader) {
-        this.cookies = setCookieHeader.map(cookie => cookie.split(';')[0]).join('; ')
+        this.cookies = setCookieHeader.map((cookie: string) => cookie.split(';')[0]).join('; ')
       }
 
-      // Prepare form data
-      const params = new URLSearchParams()
-      params.append('Username', credentials.username)
-      params.append('Password', credentials.password)
-      params.append('RememberMe', 'false')
+      // Extract __RequestVerificationToken from the HTML
+      const tokenMatch = loginPageResponse.data.match(/__RequestVerificationToken['"]\s*value=['"]([^'"]+)['"]/);
+      const verificationToken = tokenMatch ? tokenMatch[1] : '';
 
-      // Attempt to login
+      console.log('Got verification token:', verificationToken ? 'Yes' : 'No');
+
+      // Prepare login data
+      const loginData = {
+        Username: credentials.username,
+        Password: credentials.password,
+        LoginType: 'Normal',
+        IsWebRequest: 'true',
+        IsValidateMobile: '',
+        __RequestVerificationToken: verificationToken
+      };
+
+      // Convert to form data
+      const params = new URLSearchParams();
+      Object.entries(loginData).forEach(([key, value]) => {
+        params.append(key, value);
+      });
+
+      // Attempt to login using the actual API endpoint
       const loginResponse = await axios.post(
-        `${this.baseURL}/Security/Login`,
+        'https://app.factohr.com/API/ACL/ValidateLoginCreadentials',
         params.toString(),
         {
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Cookie': this.cookies,
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'X-Requested-With': 'XMLHttpRequest',
             'Referer': `${this.baseURL}/Security/Login`,
+            'Origin': 'https://app.factohr.com',
           },
           withCredentials: true,
-          maxRedirects: 0,
-          validateStatus: (status) => status >= 200 && status < 400,
+          validateStatus: (status) => status >= 200 && status < 500,
         }
       )
 
       // Check if login was successful
-      if (loginResponse.status === 302 || loginResponse.status === 200) {
+      if (loginResponse.status === 200 && loginResponse.data?.Status === 'Success') {
         // Update cookies
         const newCookies = loginResponse.headers['set-cookie']
         if (newCookies) {
-          this.cookies = newCookies.map(cookie => cookie.split(';')[0]).join('; ')
+          this.cookies = newCookies.map((cookie: string) => cookie.split(';')[0]).join('; ')
         }
+        
+        console.log('Login successful for user:', credentials.username);
         return true
       }
 
+      console.log('Login failed:', loginResponse.data?.Message || 'Unknown error');
       return false
     } catch (error: any) {
       console.error('FactoHR login error:', error)
