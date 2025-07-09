@@ -10,7 +10,7 @@ export interface TokenPayload {
 
 export function generateToken(user: IUser): string {
   const payload: TokenPayload = {
-    userId: user._id.toString(),
+    userId: (user._id as any).toString(),
     username: user.username,
   }
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })

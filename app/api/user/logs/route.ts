@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get logs sorted by date (most recent first)
-    const sortedLogs = user.attendanceLogs.sort((a, b) => 
+    const sortedLogs = user.attendanceLogs.sort((a: any, b: any) => 
       b.date.getTime() - a.date.getTime()
     ).slice(0, 30) // Last 30 days
 

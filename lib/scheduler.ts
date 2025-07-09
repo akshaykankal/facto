@@ -1,4 +1,4 @@
-import cron from 'node-cron'
+import * as cron from 'node-cron'
 import dbConnect from './mongodb'
 import User, { IUser } from '@/models/User'
 import { processAttendance } from './factohr'
@@ -23,7 +23,7 @@ export class AttendanceScheduler {
   }
 
   async scheduleUserAttendance(user: IUser) {
-    const userId = user._id.toString()
+    const userId = (user._id as any).toString()
     
     // Clear existing tasks for this user
     this.clearUserTasks(userId)
@@ -35,9 +35,6 @@ export class AttendanceScheduler {
     const punchInCron = this.getCronExpression(punchInTime, randomMinutes)
     const punchInTask = cron.schedule(punchInCron, async () => {
       await this.processUserAttendance(userId, 'punchIn')
-    }, {
-      scheduled: true,
-      timezone: 'Asia/Kolkata'
     })
     this.tasks.set(`${userId}-punchIn`, punchInTask)
 
@@ -45,9 +42,6 @@ export class AttendanceScheduler {
     const punchOutCron = this.getCronExpression(punchOutTime, randomMinutes)
     const punchOutTask = cron.schedule(punchOutCron, async () => {
       await this.processUserAttendance(userId, 'punchOut')
-    }, {
-      scheduled: true,
-      timezone: 'Asia/Kolkata'
     })
     this.tasks.set(`${userId}-punchOut`, punchOutTask)
   }
