@@ -12,5 +12,16 @@
       "path": "/api/attendance/check",
       "schedule": "30 3 * * *"
     }
+  ],
+  "headers": [
+    {
+      "source": "/api/attendance/check",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
   ]
 }
