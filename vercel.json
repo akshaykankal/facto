@@ -2,12 +2,15 @@
   "functions": {
     "app/api/scheduler/route.ts": {
       "maxDuration": 10
+    },
+    "app/api/attendance/check/route.ts": {
+      "maxDuration": 10
     }
   },
   "crons": [
     {
-      "path": "/api/scheduler",
-      "schedule": "0 8 * * *"
+      "path": "/api/attendance/check",
+      "schedule": "30 3 * * *"
     }
   ]
 }

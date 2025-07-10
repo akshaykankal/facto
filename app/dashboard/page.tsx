@@ -111,6 +111,25 @@ export default function Dashboard() {
     }
   }
 
+  const handleCheckScheduler = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      const response = await fetch('/api/attendance/check', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      const data = await response.json()
+      alert(`Scheduler Check: ${data.message}\nCurrent time: ${new Date(data.currentTime).toLocaleString()}`)
+    } catch (error) {
+      console.error('Scheduler check error:', error)
+      alert('Failed to check scheduler')
+    }
+  }
+
   const handleLogout = () => {
     localStorage.removeItem('token')
     // Clear cookie
@@ -229,6 +248,12 @@ export default function Dashboard() {
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                 >
                   Test Punch Out
+                </button>
+                <button
+                  onClick={handleCheckScheduler}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Check Scheduler
                 </button>
               </div>
             </div>
