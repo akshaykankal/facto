@@ -5,6 +5,16 @@ import { processAttendance } from '@/lib/factohr'
 
 export async function GET(request: NextRequest) {
   try {
+    // Allow cron secret or authenticated users
+    const cronSecret = request.headers.get('x-cron-secret')
+    const authHeader = request.headers.get('authorization')
+    
+    const validCronSecret = process.env.CRON_SECRET || 'your-cron-secret-here'
+    
+    if (cronSecret !== validCronSecret && !authHeader) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    
     await dbConnect()
     
     const now = new Date()
