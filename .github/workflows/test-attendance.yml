@@ -1,0 +1,61 @@
+name: Test Attendance Connection
+
+on:
+  workflow_dispatch: # Manual trigger only for testing
+
+jobs:
+  test-connection:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: |
+        npm install mongodb
+        npm install dotenv
+    
+    - name: Test MongoDB Connection
+      env:
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      run: |
+        node -e "
+        const { MongoClient } = require('mongodb');
+        
+        async function test() {
+          const client = new MongoClient(process.env.MONGODB_URI);
+          try {
+            await client.connect();
+            console.log('✅ Connected to MongoDB successfully!');
+            
+            // Try both database names
+            const db1 = client.db('FACTOHR');
+            const db2 = client.db('FACTOHR\\n');
+            
+            const count1 = await db1.collection('users').countDocuments();
+            const count2 = await db2.collection('users').countDocuments();
+            
+            console.log('Users in FACTOHR:', count1);
+            console.log('Users in FACTOHR\\\\n:', count2);
+            
+            if (count2 > 0) {
+              console.log('⚠️  Database has newline character in name!');
+              console.log('✅ Found', count2, 'users in database with newline');
+            }
+            
+          } catch (error) {
+            console.error('❌ Error:', error.message);
+            process.exit(1);
+          } finally {
+            await client.close();
+          }
+        }
+        
+        test();
+        "

@@ -18,8 +18,8 @@ Go to your GitHub repository → Settings → Secrets and variables → Actions
 
 Add these secrets:
 - `MONGODB_URI`: Your MongoDB connection string (same as in Vercel)
-- `DB_NAME`: Your database name (probably "FACTOHR")
-- `ENCRYPTION_KEY`: Your encryption key for passwords
+- `DB_NAME`: Set to `FACTOHR` (Note: there's a database naming issue, the script handles it)
+- `ENCRYPTION_KEY`: Your encryption key for passwords (use: a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6)
 
 ### 2. Push the Code
 

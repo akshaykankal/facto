@@ -25,10 +25,17 @@ jobs:
         npm install axios
         npm install dotenv
     
-    - name: Run attendance check
+    - name: Debug MongoDB Connection
       env:
         MONGODB_URI: ${{ secrets.MONGODB_URI }}
         DB_NAME: ${{ secrets.DB_NAME }}
+      run: |
+        node scripts/debug-mongodb.js --github
+    
+    - name: Run attendance check
+      env:
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        DB_NAME: 'FACTOHR\n'
         ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       run: |
         node scripts/direct-attendance-check.js
