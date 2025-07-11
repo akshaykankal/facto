@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FactoHR Auto Scheduler</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .logs {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #007bff;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 FactoHR Auto Scheduler</h1>
+        
+        <div class="info">
+            <strong>How to use:</strong>
+            <ol>
+                <li>Login to your FactoHR dashboard first</li>
+                <li>Keep this tab open in your browser</li>
+                <li>The scheduler will check attendance every 15 minutes</li>
+                <li>You can minimize the browser, but don't close it</li>
+            </ol>
+        </div>
+
+        <div id="status" class="status inactive">
+            Scheduler Status: <strong id="statusText">Not Started</strong>
+        </div>
+
+        <button onclick="startScheduler()">Start Auto Scheduler</button>
+        <button onclick="stopScheduler()">Stop Scheduler</button>
+        <button onclick="checkNow()">Check Attendance Now</button>
+
+        <h3>Activity Logs:</h3>
+        <div id="logs" class="logs">
+            <div class="log-entry">Waiting to start...</div>
+        </div>
+    </div>
+
+    <script>
+        let schedulerInterval = null;
+        let isRunning = false;
+
+        // Check if we have auth token
+        function getAuthToken() {
+            // Try to get from localStorage
+            const token = localStorage.getItem('token');
+            if (!token) {
+                addLog('❌ No auth token found. Please login first.', 'error');
+                return null;
+            }
+            return token;
+        }
+
+        // Add log entry
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.borderColor = type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff';
+            entry.textContent = `[${new Date().toLocaleString()}] ${message}`;
+            logs.insertBefore(entry, logs.firstChild);
+            
+            // Keep only last 50 logs
+            while (logs.children.length > 50) {
+                logs.removeChild(logs.lastChild);
+            }
+        }
+
+        // Check attendance
+        async function checkAttendance() {
+            const token = getAuthToken();
+            if (!token) return;
+
+            try {
+                addLog('🔄 Checking attendance...');
+                
+                const response = await fetch('/api/attendance/check', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'x-cron-secret': 'your-cron-secret-change-in-production'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addLog(`✅ Attendance checked: ${data.message}`, 'success');
+                } else {
+                    addLog(`❌ Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Network error: ${error.message}`, 'error');
+            }
+        }
+
+        // Start scheduler
+        function startScheduler() {
+            if (isRunning) {
+                addLog('⚠️ Scheduler is already running');
+                return;
+            }
+
+            const token = getAuthToken();
+            if (!token) {
+                alert('Please login to the dashboard first!');
+                return;
+            }
+
+            isRunning = true;
+            updateStatus(true);
+            addLog('🚀 Scheduler started - will check every 15 minutes', 'success');
+            
+            // Check immediately
+            checkAttendance();
+            
+            // Then check every 15 minutes
+            schedulerInterval = setInterval(checkAttendance, 15 * 60 * 1000);
+            
+            // Save state
+            localStorage.setItem('schedulerRunning', 'true');
+        }
+
+        // Stop scheduler
+        function stopScheduler() {
+            if (!isRunning) {
+                addLog('⚠️ Scheduler is not running');
+                return;
+            }
+
+            isRunning = false;
+            updateStatus(false);
+            
+            if (schedulerInterval) {
+                clearInterval(schedulerInterval);
+                schedulerInterval = null;
+            }
+            
+            addLog('🛑 Scheduler stopped', 'error');
+            localStorage.removeItem('schedulerRunning');
+        }
+
+        // Check now
+        function checkNow() {
+            checkAttendance();
+        }
+
+        // Update status display
+        function updateStatus(running) {
+            const statusEl = document.getElementById('status');
+            const statusText = document.getElementById('statusText');
+            
+            if (running) {
+                statusEl.className = 'status active';
+                statusText.textContent = 'Running';
+            } else {
+                statusEl.className = 'status inactive';
+                statusText.textContent = 'Stopped';
+            }
+        }
+
+        // Check if scheduler was running before
+        window.onload = function() {
+            const wasRunning = localStorage.getItem('schedulerRunning') === 'true';
+            if (wasRunning) {
+                addLog('🔄 Resuming scheduler from previous session');
+                startScheduler();
+            }
+        };
+
+        // Prevent closing if scheduler is running
+        window.onbeforeunload = function(e) {
+            if (isRunning) {
+                return 'Scheduler is running. Are you sure you want to close this tab?';
+            }
+        };
+    </script>
+</body>
+</html>

@@ -9,7 +9,7 @@
   },
   "crons": [
     {
-      "path": "/api/attendance/check",
+      "path": "/api/internal/trigger",
       "schedule": "30 3 * * *"
     }
   ],
