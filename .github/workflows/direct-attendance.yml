@@ -35,7 +35,7 @@ jobs:
     - name: Run attendance check
       env:
         MONGODB_URI: ${{ secrets.MONGODB_URI }}
-        DB_NAME: 'FACTOHR\n'
+        DB_NAME: ${{ secrets.DB_NAME }}
         ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       run: |
         node scripts/direct-attendance-check.js

@@ -110,9 +110,8 @@ async function checkAndMarkAttendance() {
     await client.connect();
     console.log('Connected to MongoDB');
     
-    // Use the correct database name (has a newline character issue)
-    const dbName = process.env.DB_NAME || 'FACTOHR\n';
-    const db = client.db(dbName.trim()); // Trim any whitespace/newlines
+    // Use clean database name
+    const db = client.db(process.env.DB_NAME || 'FACTOHR');
     const usersCollection = db.collection('users');
     
     const now = new Date();
