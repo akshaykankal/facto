@@ -37,22 +37,43 @@ async function loginToFactoHR(username, password) {
     const loginPageResponse = await axios.get('https://app.factohr.com/broseindia/Security/Login');
     const loginPageHtml = loginPageResponse.data;
     
-    // Extract verification token
-    const tokenMatch = loginPageHtml.match(/name="__RequestVerificationToken".*?value="([^"]+)"/);
+    // Extract verification token - look for the actual token value, not the JavaScript function
+    const tokenMatch = loginPageHtml.match(/<input[^>]*name="__RequestVerificationToken"[^>]*value="([^"]+)"[^>]*\/>/);
     if (!tokenMatch) {
+      console.log('Could not find token, HTML snippet:', loginPageHtml.substring(0, 500));
       throw new Error('Could not find verification token');
     }
-    const verificationToken = tokenMatch[1];
+    
+    // Filter out JavaScript code - the real token should be long and not contain JavaScript
+    let verificationToken = tokenMatch[1];
+    if (verificationToken.includes('getAntiForgeryToken') || verificationToken.length < 50) {
+      // Look for another match that has the actual token
+      const allMatches = loginPageHtml.matchAll(/<input[^>]*name="__RequestVerificationToken"[^>]*value="([^"]+)"[^>]*\/>/g);
+      for (const match of allMatches) {
+        if (!match[1].includes('getAntiForgeryToken') && match[1].length > 50) {
+          verificationToken = match[1];
+          break;
+        }
+      }
+    }
+    
     console.log('Found verification token:', verificationToken.substring(0, 20) + '...');
     
     // Login to FactoHR
     const params = new URLSearchParams({
       Username: username,
       Password: password,
-      LoginType: 'Employee',
+      LoginType: 'Normal',
       IsWebRequest: 'true',
-      IsValidateMobile: 'false',
+      IsValidateMobile: '',
       __RequestVerificationToken: verificationToken,
+    });
+    
+    console.log('Login params:', {
+      Username: username,
+      Password: password.substring(0, 3) + '***',
+      LoginType: 'Employee',
+      tokenLength: verificationToken.length
     });
     
     const loginResponse = await axios.post(
