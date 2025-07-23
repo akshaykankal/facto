@@ -110,8 +110,22 @@ async function checkAndMarkAttendance() {
     await client.connect();
     console.log('Connected to MongoDB');
     
-    // Use clean database name
-    const db = client.db(process.env.DB_NAME || 'FACTOHR');
+    // List all databases
+    const adminDb = client.db('admin');
+    const databases = await adminDb.admin().listDatabases();
+    console.log('Available databases:', databases.databases.map(d => d.name));
+    
+    // Use clean database name - handle newline in database name
+    const dbName = (process.env.DB_NAME || 'FACTOHR').trim();
+    // If the database doesn't exist as-is, try with newline
+    let db = client.db(dbName);
+    
+    // Check if we need to use the database with newline
+    const dbList = databases.databases.map(d => d.name);
+    if (!dbList.includes(dbName) && dbList.includes(dbName + '\n')) {
+      console.log('Using database name with newline');
+      db = client.db(dbName + '\n');
+    }
     const usersCollection = db.collection('users');
     
     const now = new Date();
@@ -121,8 +135,15 @@ async function checkAndMarkAttendance() {
     console.log(`Checking attendance at ${now.toISOString()} (Day: ${dayOfWeek})`);
     
     // Get all users
+    console.log('Database name:', db.databaseName);
+    console.log('Collection name:', usersCollection.collectionName);
     const users = await usersCollection.find({}).toArray();
     console.log(`Found ${users.length} users`);
+    if (users.length === 0) {
+      // Try to list all collections
+      const collections = await db.listCollections().toArray();
+      console.log('Available collections:', collections.map(c => c.name));
+    }
     
     let processed = 0;
     
