@@ -205,6 +205,9 @@ async function checkAndMarkAttendance() {
       const punchInTimeMinutes = punchInHour * 60 + punchInMinute;
       const punchInWindow = preferences.randomMinutes || 25;
       
+      console.log(`User ${user.username} - Punch in time: ${preferences.punchInTime}, Current time: ${now.toTimeString()}`);
+      console.log(`Today's log:`, todayLog);
+      
       if (!todayLog?.punchIn && 
           currentTime >= punchInTimeMinutes - punchInWindow && 
           currentTime <= punchInTimeMinutes + punchInWindow) {
