@@ -84,8 +84,8 @@ async function loginToFactoHR(username, password) {
 async function markAttendance(cookies, action) {
   try {
     const endpoint = action === 'punchIn' 
-      ? 'https://app.factohr.com/API/Attendance/PunchIn'
-      : 'https://app.factohr.com/API/Attendance/PunchOut';
+      ? 'https://app.factohr.com/broseindia/Attendance/PunchIn'
+      : 'https://app.factohr.com/broseindia/Attendance/PunchOut';
     
     const response = await axios.post(
       endpoint,
@@ -94,6 +94,7 @@ async function markAttendance(cookies, action) {
         headers: {
           'Cookie': cookies.join('; '),
           'X-Requested-With': 'XMLHttpRequest',
+          'Referer': 'https://app.factohr.com/broseindia/',
         },
       }
     );
@@ -132,11 +133,15 @@ async function checkAndMarkAttendance() {
     }
     const usersCollection = db.collection('users');
     
+    // Use Indian timezone
     const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-    const dayOfWeek = now.getDay();
+    const indianTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    const currentTime = indianTime.getHours() * 60 + indianTime.getMinutes();
+    const dayOfWeek = indianTime.getDay();
     
-    console.log(`Checking attendance at ${now.toISOString()} (Day: ${dayOfWeek})`);
+    console.log(`Checking attendance at ${now.toISOString()} (UTC)`);
+    console.log(`Indian time: ${indianTime.toLocaleString('en-IN', {timeZone: 'Asia/Kolkata'})} (Day: ${dayOfWeek})`);
+    console.log(`Current time in minutes: ${currentTime} (${Math.floor(currentTime/60)}:${currentTime%60})`);
     
     // Get all users
     console.log('Database name:', db.databaseName);
@@ -160,8 +165,8 @@ async function checkAndMarkAttendance() {
         continue;
       }
       
-      // Check if today is a leave day
-      const todayString = now.toISOString().split('T')[0];
+      // Check if today is a leave day (using Indian date)
+      const todayString = indianTime.toISOString().split('T')[0];
       const isLeaveDay = preferences.leaveDates.some(
         (leaveDate) => new Date(leaveDate).toISOString().split('T')[0] === todayString
       );
@@ -171,8 +176,8 @@ async function checkAndMarkAttendance() {
         continue;
       }
       
-      // Check if user has already punched in/out today
-      const todayStart = new Date(now);
+      // Check if user has already punched in/out today (using Indian date)
+      const todayStart = new Date(indianTime);
       todayStart.setHours(0, 0, 0, 0);
       
       const todayLog = user.attendanceLogs?.find(
@@ -205,12 +210,16 @@ async function checkAndMarkAttendance() {
       const punchInTimeMinutes = punchInHour * 60 + punchInMinute;
       const punchInWindow = preferences.randomMinutes || 25;
       
-      console.log(`User ${user.username} - Punch in time: ${preferences.punchInTime}, Current time: ${now.toTimeString()}`);
+      console.log(`User ${user.username} - Punch in time: ${preferences.punchInTime}, Current Indian time: ${Math.floor(currentTime/60)}:${String(currentTime%60).padStart(2, '0')}`);
       console.log(`Today's log:`, todayLog);
+      console.log(`Punch in window: ${Math.floor((punchInTimeMinutes - punchInWindow)/60)}:${String((punchInTimeMinutes - punchInWindow)%60).padStart(2, '0')} - ${Math.floor((punchInTimeMinutes + punchInWindow)/60)}:${String((punchInTimeMinutes + punchInWindow)%60).padStart(2, '0')}`);
+      
+      // Force punch in if FORCE_PUNCH_IN env var is set (for testing)
+      const forcePunchIn = process.env.FORCE_PUNCH_IN === 'true';
       
       if (!todayLog?.punchIn && 
-          currentTime >= punchInTimeMinutes - punchInWindow && 
-          currentTime <= punchInTimeMinutes + punchInWindow) {
+          (forcePunchIn || (currentTime >= punchInTimeMinutes - punchInWindow && 
+          currentTime <= punchInTimeMinutes + punchInWindow))) {
         
         console.log(`Processing punch in for ${user.username}`);
         
