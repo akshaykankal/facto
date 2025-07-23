@@ -14,6 +14,10 @@ const getEncryptionKey = () => {
 const decrypt = (text) => {
   try {
     const parts = text.split(':');
+    if (parts.length !== 2) {
+      console.error('Invalid encrypted format - expected format: iv:encryptedText');
+      return text;
+    }
     const iv = Buffer.from(parts[0], 'hex');
     const encryptedText = Buffer.from(parts[1], 'hex');
     const decipher = crypto.createDecipheriv('aes-256-cbc', getEncryptionKey(), iv);
@@ -22,7 +26,7 @@ const decrypt = (text) => {
     return decrypted.toString();
   } catch (error) {
     console.error('Decryption error:', error);
-    return text;
+    throw error; // Re-throw to handle at call site
   }
 };
 
@@ -179,7 +183,22 @@ async function checkAndMarkAttendance() {
       );
       
       // Decrypt FactoHR password
-      const decryptedPassword = decrypt(factohrPassword);
+      console.log(`Processing user: ${user.username}`);
+      if (!factohrPassword) {
+        console.log(`Skipping ${user.username} - no FactoHR password set`);
+        continue;
+      }
+      
+      let decryptedPassword;
+      try {
+        decryptedPassword = decrypt(factohrPassword);
+        if (decryptedPassword === factohrPassword) {
+          console.log(`Warning: Password for ${user.username} might not be encrypted or decryption failed`);
+        }
+      } catch (error) {
+        console.error(`Failed to decrypt password for ${user.username}:`, error.message);
+        continue;
+      }
       
       // Process punch in
       const [punchInHour, punchInMinute] = preferences.punchInTime.split(':').map(Number);
