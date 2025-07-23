@@ -43,13 +43,16 @@ async function loginToFactoHR(username, password) {
       throw new Error('Could not find verification token');
     }
     const verificationToken = tokenMatch[1];
+    console.log('Found verification token:', verificationToken.substring(0, 20) + '...');
     
     // Login to FactoHR
     const params = new URLSearchParams({
-      __RequestVerificationToken: verificationToken,
-      UserName: username,
+      Username: username,
       Password: password,
-      RememberMe: 'false',
+      LoginType: 'Employee',
+      IsWebRequest: 'true',
+      IsValidateMobile: 'false',
+      __RequestVerificationToken: verificationToken,
     });
     
     const loginResponse = await axios.post(
@@ -60,11 +63,16 @@ async function loginToFactoHR(username, password) {
           'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
           'X-Requested-With': 'XMLHttpRequest',
           'Cookie': loginPageResponse.headers['set-cookie']?.join('; ') || '',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Referer': 'https://app.factohr.com/broseindia/Security/Login',
+          'Origin': 'https://app.factohr.com',
         },
         maxRedirects: 0,
         validateStatus: (status) => status < 400,
       }
     );
+    
+    console.log('Login response:', loginResponse.data);
     
     if (loginResponse.data.Status === 'Success' || loginResponse.data.RedirectUrl) {
       console.log(`Successfully logged in for user: ${username}`);
@@ -73,6 +81,7 @@ async function loginToFactoHR(username, password) {
         cookies: loginResponse.headers['set-cookie'] || [],
       };
     } else {
+      console.log('Login failed response:', loginResponse.data);
       throw new Error(loginResponse.data.Message || 'Login failed');
     }
   } catch (error) {
@@ -83,18 +92,23 @@ async function loginToFactoHR(username, password) {
 
 async function markAttendance(cookies, action) {
   try {
-    const endpoint = action === 'punchIn' 
-      ? 'https://app.factohr.com/broseindia/Attendance/PunchIn'
-      : 'https://app.factohr.com/broseindia/Attendance/PunchOut';
+    const checkIn = action === 'punchIn' ? 'true' : 'false';
     
-    const response = await axios.post(
-      endpoint,
-      {},
+    const response = await axios.get(
+      'https://app.factohr.com/broseindia/API/Dashboard/SubmitAttendance1',
       {
+        params: {
+          checkIn: checkIn,
+          remarks: '',
+          zone: 'Asia/Calcutta',
+          singleInOutPunch: 'false',
+          ishomepage: 'true',
+        },
         headers: {
           'Cookie': cookies.join('; '),
           'X-Requested-With': 'XMLHttpRequest',
-          'Referer': 'https://app.factohr.com/broseindia/',
+          'Accept': 'application/json, text/javascript, */*; q=0.01',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       }
     );
