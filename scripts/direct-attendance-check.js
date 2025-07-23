@@ -135,7 +135,11 @@ async function checkAndMarkAttendance() {
     
     // Use Indian timezone
     const now = new Date();
-    const indianTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kolkata"}));
+    // Get the timezone offset for Asia/Kolkata (IST is UTC+5:30)
+    const istOffset = 5.5 * 60; // 5.5 hours in minutes
+    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const indianTime = new Date(utcTime + (istOffset * 60000));
+    
     const currentTime = indianTime.getHours() * 60 + indianTime.getMinutes();
     const dayOfWeek = indianTime.getDay();
     
@@ -183,7 +187,9 @@ async function checkAndMarkAttendance() {
       const todayLog = user.attendanceLogs?.find(
         (log) => {
           const logDate = new Date(log.date);
-          return logDate.toDateString() === todayStart.toDateString();
+          // Compare dates in IST
+          const logDateIST = new Date(logDate.getTime() + (5.5 * 60 * 60000));
+          return logDateIST.toDateString() === todayStart.toDateString();
         }
       );
       
@@ -268,9 +274,14 @@ async function checkAndMarkAttendance() {
       const punchOutTimeMinutes = punchOutHour * 60 + punchOutMinute;
       const punchOutWindow = preferences.randomMinutes || 25;
       
+      console.log(`Punch out window: ${Math.floor((punchOutTimeMinutes - punchOutWindow)/60)}:${String((punchOutTimeMinutes - punchOutWindow)%60).padStart(2, '0')} - ${Math.floor((punchOutTimeMinutes + punchOutWindow)/60)}:${String((punchOutTimeMinutes + punchOutWindow)%60).padStart(2, '0')}`);
+      
+      // Force punch out if FORCE_PUNCH_OUT env var is set (for testing)
+      const forcePunchOut = process.env.FORCE_PUNCH_OUT === 'true';
+      
       if (todayLog?.punchIn && !todayLog?.punchOut &&
-          currentTime >= punchOutTimeMinutes - punchOutWindow && 
-          currentTime <= punchOutTimeMinutes + punchOutWindow) {
+          (forcePunchOut || (currentTime >= punchOutTimeMinutes - punchOutWindow && 
+          currentTime <= punchOutTimeMinutes + punchOutWindow))) {
         
         console.log(`Processing punch out for ${user.username}`);
         
