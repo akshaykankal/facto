@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="shortcut icon" href="/landing_page/images/favicon.png" />
+    
+    <script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/jquery-3.0.0.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/jquery-ui.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/jquery.validate.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/jquery.validate.unobtrusive.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/ajaxRequestMonitoring.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/Chart.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/jquery.steps.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/jquery.dataTables.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/popper.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/bootstrap.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/mustache.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/underscore.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/dataTables.bootstrap4.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/respond.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Scripts/rowlink.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/bootstrapAlerts.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/toastr.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/ui-toastr.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/select2.full.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/moment.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/intro.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/fullcalendar.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Scripts/hashtable.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Scripts/vspl.util.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Scripts/vspl.global.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/bootstrap.datetimepicker.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Scripts/Analytics.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/New-bootstrap-datetimepicker.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/ckeditor/ckeditor.js"></script>
+<script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/ckeditor/samples/js/sample.js"></script>
+
+
+    
+    
+ 
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Content/css/google-fonts.css?v=D317A86D3732031BB54E7358F231AF11" rel="stylesheet"/>
+
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Content/css/plus-jakarta-fonts.css?v=141B771274A0F1C19C6E3D6EADB0DBD1" rel="stylesheet"/>
+
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Content/css/autocomplete.css?v=146EEE09AEA4A9AAE0D5109C9C76EA4E" rel="stylesheet"/>
+
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Content/css/toastr.css?v=BC96861D9899E4E68FB2E59C363D8C60" rel="stylesheet"/>
+
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Content/css/site.css?v=2ED856DC67DE01105CD718F5AE324785" rel="stylesheet"/>
+
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Resources/Sign-Up/css/styles.css?v=7C68ABE6FD26A489F5876A8D9AE7E183" rel="stylesheet"/>
+
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Content/css/bootstrap.min.css?v=62907EF14A08AC2199B60610B616D0E5" rel="stylesheet"/>
+
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Content/css/line-awesome-1.3.0/css/line-awesome.css?v=1B57B5B9262DD98560A342155E0AFDF6" rel="stylesheet"/>
+
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Content/css/font-awesome-4.7.0/css/font-awesome.css?v=4BB3DD721C4652FEEE0953261D329710" rel="stylesheet"/>
+
+    
+    
+    
+    
+    
+    <link href="https://appfactohrcom2022-1c175.kxcdn.com//Resources/Login/css/Newlogin2.css" rel="stylesheet"/>
+
+
+
+    
+    <script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/dynamicmenu.js?v=E70EA5C1605C5AFC73C921B85AFAE90B"></script>
+
+    <script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/dynamicmenu.js?v=E70EA5C1605C5AFC73C921B85AFAE90B"></script>
+
+    <script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/tabcontrols.js?v=9045C79D98F9FC8B2CE904490EAF2138"></script>
+
+    <script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/custom.js?v=95B031B2FFE04EC38257DC51CAD9F469"></script>
+
+    <script src="https://appfactohrcom2022-1c175.kxcdn.com//Content/js/common-ui.js?v=0DF4AFC364FBAA00BB69988BDF034C23"></script>
+
+    
+    <style>
+        .Slider-item {
+            width: 100%;
+            display: none;
+            opacity: 0;
+            height: 90%;
+        }
+
+        .Active {
+            transition: opacity 2s ease-in;
+            display: grid;
+            opacity: 1;
+            -webkit-animation: SlideIn 1s;
+            -moz-animation: SlideIn 1s;
+            -ms-animation: SlideIn 1s;
+            -o-animation: SlideIn 1s;
+            animation: SlideIn 1s;
+        }
+
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            .Active {
+                transition: opacity 2s ease-in;
+                display: inline-table;
+                opacity: 1;
+                -webkit-animation: SlideIn 1s;
+                -moz-animation: SlideIn 1s;
+                -ms-animation: SlideIn 1s;
+                -o-animation: SlideIn 1s;
+                animation: SlideIn 1s;
+            }
+        }  
+
+        /*@keyframes SlideIn {
+            0% {
+                width: 0%;
+                right: 100%;
+            }
+
+            100% {
+                right: 0%;
+                width: 100%;
+                overflow: hidden;
+                transform: translateX(0%);
+            }
+        }*/
+        @keyframes SlideIn{
+            0% {
+                transform: translateX(100%);
+                width: 100%;
+            }
+            100% {
+                transform: translateX(0%);
+                width: 100%;
+                overflow: hidden;
+            }
+        }
+
+        .NoNews {
+            text-align: center;
+            margin-top: 30%;
+        }
+
+        .SlideChanger {
+            position: relative;         
+            z-index: 15;
+            text-align: center;
+            padding-top:25px;
+        }
+
+        .Slide-item-Indicator {
+            width: 11px;
+            height: 11px;
+            margin: 0 4px;
+            position: relative;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: inline-block;
+            background-color: transparent;
+            cursor: pointer;
+            border: 2px solid #5d5d5d;
+        }
+
+        .Slide-Active {
+            background-color: #5d5d5d;
+        }
+
+        .currenttrends {
+            background-color: transparent;
+            box-shadow: 7px 3px 6px 4px rgba(0,0,0,0.1);
+        }
+
+        .currenttreandstitle {
+            text-align: center;
+            left: -15px;
+            box-shadow: 8px -5px 6px 4px transparent;
+        }
+
+        .currenttreandsbody {
+            overflow-y: auto;
+            padding: 15px;
+            overflow-y: scroll;
+            height: 100%;
+            position: absolute;
+        }
+
+        #NewsTitle {
+            text-transform: uppercase;
+        }
+
+        .slider-style {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+        @media only screen and (max-width: 570px){
+             #News {
+                display: none;
+            }
+        }
+       
+        @media only screen and (max-width: 800px){
+            #News {
+                display: none;
+            }
+        }
+        .slider-image {
+            max-width:623px;
+             width:100%;
+             height: auto;
+            /*height:510px;*/
+        }
+        .currenttreandsbody{padding:0px;}
+        .SlideChanger{padding;0px;display: flex;justify-content: center;}
+        .login-screen-main .col-md-6{padding:0px 15px;}
+        /*.login-bg-main{
+            height: calc(100vh - 10px);
+        }*/
+    </style>
+
+    <script>
+        var backgroundImagePath = '~/Resources/Sign-Up/images/New/LoginBg.png?v=12360';
+        $(document).ready(function () {
+            //Change below image number in case of change background images.
+            SetNewBackgroundImage(backgroundImagePath);
+
+            var CurrentSlide = 1;
+            var Interval = 5000;
+            var NewsTitle = $('#NewsTitle');
+            var SliderDiv = $('#Slider');
+            var SlideChanger = $('#SlideChanger');
+            var Slide_item_Indicator = $('.Slide-item-Indicator');
+            var IsShowExtractImage = '';
+            var SliderInterval = 0;
+            
+            document.getElementById('copyright').innerText = "Copyright © " + new Date().getFullYear() + " Version Systems Pvt. Ltd.";
+            SetNewsData();
+            //setCopyrightPosition();
+            //setbodyImagePosition();
+            //setImagePositoion();
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip({
+                    animation: true,
+                    html: true
+                })
+            });
+
+            //DetectBrowser();
+
+            //SetClientTodayNews();
+
+            $('li > a').mouseover(function () {
+                var id = $(this).attr('data-tooltip');
+                if (id) {
+                    var tooltip = 'tooltip' + id;
+                    var ctrl = $('#' + tooltip);
+                    if (ctrl) {
+                        var left = $(this).css('offsetLeft');
+                        var top = $(this).css('offsetTop');
+                        ctrl.css('offsetLeft', left);
+                        ctrl.css('offsetTop', top);
+                        ctrl.css('opacity', '1');
+                    }
+                }
+
+            }).mouseleave(function () {
+                var id = $(this).attr('data-tooltip');
+                if (id) {
+                    var tooltip = 'tooltip' + id;
+                    var ctrl = $('#' + tooltip);
+                    if (ctrl) {
+                        ctrl.css('opacity', '0');
+                    }
+                }
+            });
+
+            //------------------------------------------------------New Changes-------------------------------------------------------//
+
+            //$(window).resize(function () {
+            //ResizeControls();
+            //});
+
+            //function onElementHeightChange(elm, callback) {
+            //    var lastHeight = elm.clientHeight, newHeight;
+            //    (function run() {
+            //        newHeight = elm.clientHeight;
+            //        if (lastHeight != newHeight)
+            //            callback();
+            //        lastHeight = newHeight;
+
+            //        if (elm.onElementHeightChangeTimer)
+            //            clearTimeout(elm.onElementHeightChangeTimer);
+
+            //        elm.onElementHeightChangeTimer = setTimeout(run, 200);
+            //    })();
+            //}
+
+            //onElementHeightChange(document.body, function () {
+            //    ResizeControls();
+            //});
+
+            //function ResizeControls() {
+            //    setImagePositoion();
+            //    setCopyrightPosition();
+            //    setbodyImagePosition();
+            //}
+
+            function DetectBrowser() {
+                //alert(navigator.userAgent);
+                if (navigator.userAgent.search("MSIE") >= 0 || navigator.userAgent.search(".NET CLR") >= 0) {
+                    return "MSIE";
+                }
+                else if (navigator.userAgent.search("Edge") >= 0) {
+                    return "EDGE";
+                }
+                else if (navigator.userAgent.search("Chrome") >= 0) {
+                    return "CHROME";
+                }
+                else if (navigator.userAgent.search("Firefox") >= 0) {
+                    return "FIREFOX";
+                }
+                else if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") >= 0) {
+                    return "SAFARI";
+                }
+                else if (navigator.userAgent.search("Opera") >= 0) {
+                    return "OPERA";
+                }
+            }
+
+            function setCopyrightPosition() {
+                var winHeight = $(document).height();
+                if (winHeight) {
+                    var clientHeight = document.body.clientHeight;
+                    if (clientHeight) {
+                        var top = winHeight - clientHeight - 5;
+                        $('#footer').css('top', top + "px");
+
+                        var CurrentBrowser = DetectBrowser();
+                        if (CurrentBrowser) {
+                            if (CurrentBrowser == "MSIE") {
+                                $('#footer').css('top', top - 17 + "px");
+                            }
+                            else if (CurrentBrowser == "CHROME") {
+                                $('#footer').css('top', top + 5 + "px");
+                            }
+                            else if (CurrentBrowser == "FIREFOX") {
+                                $('#footer').css('top', top + "px");
+                            }
+                            else if (CurrentBrowser == "SAFARI") {
+                                $('#footer').css('top', top + "px");
+                            }
+                            else if (CurrentBrowser == "OPERA") {
+                                $('#footer').css('top', top + "px");
+                            }
+                        }
+                    }
+                }
+            }
+
+            function setbodyImagePosition() {
+                var winHeight = $(document).height();
+                if (winHeight) {
+                    var clientHeight = document.body.clientHeight;
+                    if (clientHeight) {
+                        var height = winHeight - clientHeight;
+                        //alert('50% ' + winHeight + 'px !important');
+                        $('body').css('background-size', '60% ' + winHeight + 'px !important');
+                    }
+                }
+            }
+
+            function setImagePositoion() {
+                var winHeight = $(document).height();
+                if (winHeight) {
+                    var clientHeight = document.body.clientHeight;
+                    if (clientHeight) {
+                        var height = winHeight - clientHeight;
+                        var CurrentBrowser = DetectBrowser();
+                        //alert(winHeight + " " + height);
+                        if (winHeight >= 626 && winHeight <= 650 && CurrentBrowser != "MSIE") {
+                            $('body').css('overflow-y', 'hidden');
+                        }
+                        else {
+                            $('body').css('overflow-y', 'auto');
+                        }
+
+
+                        if (CurrentBrowser) {
+                            var additionalHeight = 0;
+                            var height = $(window).height();
+                            //alert(height);
+
+                            if (height >= 626) {
+                                additionalHeight = 30;
+                            }
+
+                            if (height >= 657) {
+                                additionalHeight = 21;
+                            }
+                            //alert(CurrentBrowser);
+                            if (CurrentBrowser == "MSIE") {
+                                $('.Slider-item').attr('style', 'height:' + (clientHeight + additionalHeight + 23) + 'px !important');
+                            }
+                            else if (CurrentBrowser == "CHROME") {
+                                $('.Slider-item').attr('style', 'height:' + (clientHeight + additionalHeight + 40) + 'px !important');
+                            }
+                            else if (CurrentBrowser == "FIREFOX") {
+                                $('.Slider-item').attr('style', 'height:' + (clientHeight + additionalHeight + 27) + 'px !important');
+                            }
+                            else if (CurrentBrowser == "SAFARI") {
+                                $('.Slider-item').attr('style', 'height:' + (clientHeight + additionalHeight + 30) + 'px !important');
+                            }
+                            else if (CurrentBrowser == "OPERA") {
+                                $('.Slider-item').attr('style', 'height:' + (clientHeight + additionalHeight + 30) + 'px !important');
+                            }
+                            else if (CurrentBrowser == "EDGE") {
+                                $('.Slider-item').attr('style', 'height:' + (clientHeight + additionalHeight + 71) + 'px !important');
+                            }
+                        }
+                        else {
+                            $('.Slider-item').attr('style', 'height:' + (clientHeight) + 'px !important');
+                        }
+                    }
+                }
+            }
+
+            function SetNewBackgroundImage(path) {
+                if (path) {
+                        $('.bg-img').css('backgroundImage', 'url(' + path + ')');
+                        }
+                    //for Login Page new UI (Task# 17100) css of new background image will be change
+                    //var src = "#fff url(" + path + ") no-repeat 0% 55px !important;";
+                    ////alert(newPath);
+                    ////$('body').attr('style', 'background:', newPath);
+                    //var width = $(window).width();
+                    //var size = "60% auto";
+                    //if (width && width <= 800) {
+                    //    size = "100% auto";
+                    //}
+                    //var src = path;
+                    //$('body').css('backgroundImage', 'url(' + src + ')');
+                    //$('body').css('background-color', '#fff');
+                    //$('body').css('background-size', "auto");
+                    //$('body').css('background-repeat', 'no-repeat');
+                    //$('body').css('background-position', '-1px 55px');
+                    //$('body').css('height', '100%');
+                    //$('body').css('width', '100%');
+                }
+
+            SliderDiv.mouseover(function () {
+                clearInterval(SliderInterval);
+            }).mouseleave(function () {
+                SliderInterval = setInterval(Slider, Interval);
+            });
+
+            $('#Slider').on('click', '.Slide-item-Indicator', function () {
+                var CurrentItemClicked = $(this).attr('data-slide-index');
+                if (CurrentItemClicked) {
+                    CurrentSlide = CurrentItemClicked;
+                    Slider();
+                }
+            });
+
+            function Slider() {
+                var SlideItemTitle = $("#Slider > [data-Slide-Index=" + CurrentSlide + "]").attr('data-title');
+                if (SlideItemTitle && SlideItemTitle == null || SlideItemTitle == undefined) {
+                    CurrentSlide = 1;
+                    SlideItemTitle = $("#Slider > [data-Slide-Index=" + CurrentSlide + "]").attr('data-title');
+                }
+                if (SlideItemTitle != undefined && SlideItemTitle != null) {
+                    NewsTitle.fadeOut(function () {
+                        $(this).html(SlideItemTitle).fadeIn();
+                    });
+
+                    $('.Slider-item').removeClass('Active');
+                    $('.Slide-item-Indicator').removeClass('Slide-Active');
+                    $("#Slider > [data-Slide-Index=" + CurrentSlide + "]").addClass('Active').fadeIn();
+                    $("#SlideChanger > [data-Slide-Index=" + CurrentSlide + "]").addClass('Slide-Active');
+                    CurrentSlide = Number(CurrentSlide) + 1;
+                }
+            }
+
+            
+            //function SetClientTodayNews() {
+            //    var apiPath = "/API/ACL/GetClientNews";
+
+            //    $.ajax({
+            //        type: "POST",
+            //        url: apiPath,
+            //        success: function (result) {
+            //            if (result != null && result != "") {
+            //                if ((String)(result.Status).toUpperCase() == "SUCCESS") {
+            //                    SetNewsData(result.Data);
+            //                }
+            //                else {
+            //                    SliderDiv.html('<h3 class="NoNews">0 News Found</h3>');
+            //                    //ShowMessageBox(result.MessageTitle, result.Message);
+            //                    return false;
+            //                }
+            //            }
+            //        },
+            //        error: function (xhr, status, error) {
+
+            //            console.log(xhr);
+            //            responseText = jQuery.parseJSON(xhr.responseText);
+            //            //ShowMessageBox("Error", responseText.Message + " " + responseText.ExceptionMessage, "ERROR");
+
+            //            //console.log(responseText);
+            //            SliderDiv.html('<h3 class="NoNews">Failed to load news</h3>');
+            //            //ShowMessageBox("Error", responseText.Message);
+            //            return false;
+            //        },
+            //        complete: function () {
+            //        }
+            //    });
+            //}
+
+            
+            function SetNewsData() {
+                if (IsShowExtractImage)
+                {
+                    $('#News').html(" <div class='login-rh-main-bg p-0'> <div class='login-new-slider carousel-inner'><div class='login-sing-slide carousel-item active'><img class='slider-image' src='https://appfactohrcom2022-1c175.kxcdn.com//Resources/Login/images/extract-image.png'/></div></div></div>");
+                    //SliderDiv.html("<img class='slider-image' src='~/Resources/Login/images/extract-image.jpg' />");
+                    }
+                else
+                {
+                    //    var SliderHtml = "";
+                    //var SliderIndecatorHtml = "";
+                    //var newsData = (String)('<div class="Slider-item" data-title="{0}" data-Slide-Index="{1}">{2}</div>');
+                    //var slideDivHtml = '<div id="SlideChanger" class="SlideChanger">{0}</div>';
+                    //var Slide_Indecator_HTML = '<span class="Slide-item-Indicator" data-Slide-Index="{0}"></span>';
+                    //var data = [
+                    //    { index: 1, newshtml: '<div id="News"><img class="slider-image" src="~/Resources/Sign-Up/images/New/SliderImage/Attendance-Shift-Leave-Management.png" /></div>' },
+                    //    { index: 2, newshtml: '<div id="News"><img class="slider-image" src="~/Resources/Sign-Up/images/New/SliderImage/Travel-Claim-Reimbursement.png" /></div>' },
+                    //    { index: 3, newshtml: '<div id="News"><img class="slider-image" src="~/Resources/Sign-Up/images/New/SliderImage/Performance-Management.png" /></div>' },
+                    //    { index: 4, newshtml: '<div id="News"><img class="slider-image" src="~/Resources/Sign-Up/images/New/SliderImage/Mood-Survey.png" /></div>' },
+                    //    { index: 5, newshtml: '<div id="News"><img class="slider-image" src="~/Resources/Sign-Up/images/New/SliderImage/Acknowledgment-Survey.png" /></div>' },
+                    //    { index: 6, newshtml: '<div id="News"><img class="slider-image" src="~/Resources/Sign-Up/images/New/SliderImage/Ticketing-System.png" /></div>' },
+                    //    { index: 7, newshtml: '<div id="News"><img class="slider-image" src="~/Resources/Sign-Up/images/New/SliderImage/Selfie-Punch-with-Location-Geo-Fencing.png" /></div></div>' },
+                    //    { index: 8, newshtml: '<div id="News"><img class="slider-image" src="~/Resources/Sign-Up/images/New/SliderImage/Chatbot.png" /></div>' }];
+                    //for (var i = 0; i <= data.length; i++) {
+                    //    var news = data[i];
+                    //    if (news != null) {
+                    //        var index = i + 1;
+                    //        var title = news.Title;
+                    //        var newsHtml = news.newshtml;
+                    //        var slide = newsData;
+
+                    //        var Slide_Indecator = Slide_Indecator_HTML;
+                    //        Slide_Indecator = Slide_Indecator.replace('{0}', index);
+                    //        SliderIndecatorHtml += Slide_Indecator;
+
+                    //        slide = slide.replace('{1}', index);
+                    //        slide = slide.replace('{2}', newsHtml);
+                    //        SliderHtml += slide;
+                    //    }
+                    //}
+
+                    //if (SliderIndecatorHtml)
+                    //{
+                    //    if (data.length > 1)
+                    //    {
+                    //        slideDivHtml = slideDivHtml.replace('{0}', SliderIndecatorHtml);
+                    //        SliderHtml = SliderHtml + slideDivHtml;
+                    //    }
+                    //}
+
+                    //SliderDiv.html(SliderHtml);
+                    //Slider();
+                    //SliderInterval = setInterval(Slider, Interval);
+                }
+            }
+        });
+    </script>
+
+</head>
+<body class="pt-0 pb-0">
+     
+
+
+    
+        <div id="please-wait" class="please-wait">
+        
+            <div class="new-loader">
+                <div class="spinner">
+                    <div class="triple-spinner"></div>
+                </div>
+            </div>
+        </div>
+
+<script type="text/javascript">
+    $body = $("body");
+    $(document).on({
+        ajaxStart: function () { $('#please-wait').fadeIn(); },
+        ajaxSend: function () { },
+        ajaxComplete: function () {  },
+        ajaxError: function () {  },
+        ajaxStop: function () { $('[id="please-wait"]').fadeOut(); }
+    });
+</script>
+    
+    
+
+    <script type="text/javascript">
+
+        function PreventBack() {
+		try {
+                history.pushState(null, document.title, location.href);
+                window.addEventListener('popstate', function (event) {
+                    history.pushState(null, document.title, location.href);
+                });
+            } catch (e) { }
+        }
+
+        PreventBack();
+    </script>
+
+    <script type="text/javascript">
+ // SMS : 16062025 - On page load also check the cdn is acesible or not if not accessible then popup the alert message.
+checkCdnAccessJS(
+      function () {
+          // Success handler
+      },
+      function () {
+         //Alert is popup in the actual checking
+      }
+  );
+
+// SMS : 16062025 - In this method use pure JS because of if cdn is not accessible then JQuery also no load and we can not use the Jquery $ methods.
+  function checkCdnAccessJS(onSuccess, onFailure) {
+      var cdnUrl = "https://appfactohrcom2022-1c175.kxcdn.com/";
+      var failMessage = `The application couldn’t load correctly, possibly due to a blocked link on your network (${cdnUrl}); please contact your IT team to allow access.`;
+      if (cdnUrl != "~" && cdnUrl != "~/") {
+
+          fetch(cdnUrl, { method: 'HEAD' })
+              .then(response => {
+                  if (response.ok) {
+                      console.log("CDN is accessible.");
+                      if (onSuccess) onSuccess();
+                  } else {
+                      console.warn("CDN is not accessible: HTTP status", response.status);
+                      alert(failMessage);
+                      if (onFailure) onFailure();
+                  }
+              })
+              .catch(error => {
+                  console.warn("CDN is not accessible:", error);
+                  alert(failMessage);
+                  if (onFailure) onFailure();
+              });
+      } else {
+          if (onSuccess) onSuccess();
+      }
+  }
+
+    $(document).ready(function () {
+        //KD: in case of employee don't have right of the page then it will redirect to login and the login screen open within main frame so it redirect to main login
+        var currentLocation = window.parent.location.href;
+        if (currentLocation != null && currentLocation != undefined && currentLocation.length > 0) {
+            var location = currentLocation.toUpperCase();
+            if (location.indexOf('/DEFAULTNEW.ASPX') != -1) {
+                window.parent.location.reload(true);
+            }
+        }
+        var btnLogin = $('#btnLogin');
+        var txtUsername = $('#txtUsername');
+        var txtPassword = $('#txtPassword');
+        var txtUsername_ValidationMessage = $('#txtUsername_ValidationMessage');
+        var txtPassword_ValidationMessage = $('#txtPassword_ValidationMessage');
+        var form = $('form');
+        var _MessageBox = $('#MessageBox');
+        var MessageTitle = $('#MessageTitle');
+        var _Message = $('#Message');
+        var _please_wait_Id = $('#please-wait');
+        var focusfieldId = "";
+        var redirectPath = "";
+        var OTP = "";
+
+        var LDAPPath = '';
+        var LDAPPropertyName = '';
+        var IsCheckAuthOnADSite = 'False';
+        var IsConsoleLoggerEnabled = 'False';
+        var usrNm = '';
+        txtPassword.focus();
+        if (txtUsername.val() == "") {
+            txtUsername.focus();
+        }
+        document.getElementById('copyright').innerText = "Copyright © " + new Date().getFullYear() + " Version Systems Pvt. Ltd.";
+        clearFields();
+            
+        SetClientNewsData();
+        var IsShowExtractImage = '';
+
+        //Add password hide/show icon
+        var target = $("#togglePassword");
+        target.click(function () {
+            if ($("#txtPassword").attr("type") == "password") {
+                $("#txtPassword").attr("type", "text");
+                $("#togglePassword").attr("title", "Hide Password");
+            } else {
+                $("#txtPassword").attr("type", "password");
+                $("#togglePassword").attr("title", "Show Password");
+            }
+            this.classList.toggle('fa-eye-slash');
+        })
+
+            form.submit(function (e) {
+                e.preventDefault(); // prevent default login submit if needed
+                // SMS : 16062025 - Check first cdn is accesible then only call the Login method, If cdn is not accesible then popup the alert
+                checkCdnAccessJS(function () {
+                            // Success handler – proceed with login
+                            console.log("Proceeding with login...");
+                            focusfieldId = "";
+                            redirectPath = "";
+                            OTP = "";
+                            HideAlert();
+                            e.preventDefault();
+                            var username = txtUsername.val();
+                            var password = txtPassword.val();
+
+                            var apiPath = "/API/ACL/ValidateLoginCreadentials";
+                            var formData =
+                            {
+                                'Username': username,
+                                'Password': password,
+                                'LoginType': 'Normal',
+                                'IsWebRequest': 'true',
+                                'IsValidateMobile': (IsNullOrWhiteSpaceOrUndefined(usrNm) ? '' : 'true'),
+                                '__RequestVerificationToken': getAntiForgeryToken()
+                            };
+                            var isLoginFieldsValid = validateLoginFields(username, password);
+                            if (!isLoginFieldsValid) {
+                                return;
+                            }
+                            btnLogin.prop('disabled', 'disabled');
+                            //Loader(true);
+                            $.ajax({
+                                type: "POST",
+                                url: apiPath,
+                                data: formData,
+                                success: function (result) {
+                                    if (result.Status == "Failed") {
+                                        clearFields();
+                                        btnLogin.prop('disabled', false);
+                                        if (result.Data != "" && result.Data != null) {
+                                            errorMsgWithTimeout(result.Data, false, 5000);
+                                        }
+                                    }
+                                    ShowResult(result);
+                                },
+                                error: function (xhr, status, error) {
+                                    Loader(false);
+                                    console.log(xhr);
+                                    btnLogin.prop('disabled', false);
+                                    responseText = jQuery.parseJSON(xhr.responseText);
+                                    ShowMessageBox("Error", responseText.Message + " " + responseText.ExceptionMessage, "ERROR");
+                                },
+                                complete: function () {
+                                    Loader(false);
+                                }
+                            });
+
+                        },
+                        function () {
+                            // Failure handler – show alert or fallback logic
+                            return; // stop further JS code
+                        });
+            });
+
+            var getAntiForgeryToken = function () {
+                var rtn = $('input:hidden[name=__RequestVerificationToken]').val();
+                return rtn;
+            }
+
+            function HideAlert() {
+                $('#MessageTitle').html('');
+                $('#Message').html('');
+                $('#MessageBox').css('display', 'none');
+            }
+
+            function clearFields() {
+                txtPassword.val('');
+            }
+
+            function validateLoginFields(_username, _password) {
+                //resetValidationFields();
+                var isLoginFieldsValid = true;
+                if (_username == "" && _password == "") {
+                    errorMsgWithTimeout("Username and password are required", false, 5000);
+                    isLoginFieldsValid = false;
+                }
+                else if (_username == "") {
+                    errorMsgWithTimeout("Username is required", false, 5000);
+                    //txtUsername_ValidationMessage.text("Username is required");
+                    isLoginFieldsValid = false;
+                }
+                else if (_password == "") {
+                    errorMsgWithTimeout("Password is required", false, 5000);
+                    //txtPassword_ValidationMessage.text("Password is required");
+                    isLoginFieldsValid = false;
+                }
+                return isLoginFieldsValid;
+            }
+
+            //function resetValidationFields() {
+            //    txtUsername_ValidationMessage.text("");
+            //    txtPassword_ValidationMessage.text("");
+            //}
+
+            function Loader(visible) {
+                if (visible == true) {
+                    _please_wait_Id.css('display', 'block !important');
+                }
+                else if (visible == false) {
+                    _please_wait_Id.css('display', 'none');
+                }
+            }
+
+            $('#MessageBox').on('hidden.bs.modal', function () {
+                if (focusfieldId && focusfieldId != "") {
+                    $('#' + focusfieldId).focus();
+                }
+                else {
+                    $('#txtUsername').focus();
+                }
+
+                if (redirectPath && redirectPath != "") {
+                    var json = null;
+                    if (OTP != "") {
+                        json = { 'OTP': OTP };
+                    }
+
+                    var path = redirectPath.toUpperCase();
+                    if (path.CustomStartsWith('HTTP') || (json != null && json.length > 0)) {
+                        Redirect(redirectPath, json, "POST");
+                    }
+                    else {
+                        Redirect(redirectPath, json, "GET");
+                    }
+
+                }
+            });
+
+            function Redirect(path, data, Method) {
+                Method = (String)(Method).toUpperCase();
+                if (Method == "POST") {
+                    var url = path;
+                    if (path != null && path != undefined && path != "" && path.toUpperCase().CustomStartsWith('HTTP')) {
+                        if (data == null) {
+                            data = {};
+                        }
+                        data["LDAPPath"] = LDAPPath;
+                        data["IsCheckAuthOnADSite"] = IsCheckAuthOnADSite;
+                        data["LDAPPropertyName"] = LDAPPropertyName;
+                    }
+
+                    var text = '<form action="' + url + '" method="' + Method + '">';
+                    for (var key in data) {
+                        text += '<input type="hidden" name="' + key + '" value="' + data[key] + '" />';
+                    }
+
+                    text += '<input type="hidden" name="__RequestVerificationToken" value="' + getAntiForgeryToken() + '" />';
+                    text += '</form>';
+                    var form = $(text);
+                    $('body').append(form);
+                    form.submit();
+                }
+                else {
+
+                    ////DB: 23012024 Login issue
+                    // Append a unique query parameter to the URL
+                    var cacheBustedUrl = path + (path.includes('?') ? '&t=' : '?t=') + Date.now();
+
+                    // Redirect to the cache-busted URL
+                    window.location.href = cacheBustedUrl;
+                    //window.location.href = path;
+                }
+            }
+
+            String.prototype.CustomStartsWith = function (str) {
+                if (this.indexOf(str) === 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            //--------------------------------------------- Active Directory Code Start -------------------------------------------------//
+
+            var NoSSOCheck = "NoSSOCheck";
+
+            var DeleteNoSSOCheckCookie = function (cname) {
+                var ExipreDate = new Date();
+                ExipreDate.setTime(ExipreDate.getTime() + (-1 * 5 * 60 * 1000));
+                var expires = "expires=" + ExipreDate.toUTCString();
+                setCookieGlobal(cname, "0");
+               // document.cookie = cname + "=0" + + ";" + expires + ";path=/";
+            }
+
+            var getCookie = function (cname) {
+                var name = cname + "=";
+                var decodedCookie = decodeURIComponent(document.cookie);
+                var ca = decodedCookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
+                }
+                return "";
+            }
+
+            var CheckSSOForActiveDirectoryAuthentication = function () {
+                var NoSSOCheckcookie = getCookie(NoSSOCheck);
+                //var Token  = getCookie("Token");
+                //console.log(NoSSOCheckcookie);
+                if (NoSSOCheckcookie == "1") {
+                    DeleteNoSSOCheckCookie(NoSSOCheck);
+                }
+                else {
+                    if (NoSSOCheckcookie != 1) {
+                        //this.window.App.direct.GetActiveDirectoryUser();
+                        //var loadMask = new Ext.LoadMask(Ext.getBody(), { msg: "Verifying..." });
+                        //loadMask.show();
+
+                        if ('False' == "True") {
+                            GetActiveDirectoryUser();
+                        }
+                    }
+                }
+            }
+
+            var GetActiveDirectoryUser = function () {
+                var apiPath = "/API/ACL/GetActiveDirectoryUser";
+                var requestData =
+                {
+                    '__RequestVerificationToken': $('input:hidden[name=__RequestVerificationToken]').val()
+                };
+                $.ajax({
+                    type: "POST",
+                    url: apiPath,
+                    data: requestData,
+                    success: function (result) {
+                        //Code on Success
+                        ShowResult(result);
+                    },
+                    error: function (xhr, status, error) {
+                        //Code on error
+                        console.log(xhr);
+                        responseText = jQuery.parseJSON(xhr.responseText);
+                        ShowMessageBox("Error", responseText.Message + " " + responseText.ExceptionMessage, "ERROR");
+                    },
+                    complete: function (){
+                        //Code on Complete
+                    }
+                });
+            }
+
+            //Check if NOSSOCheck Cookie is "1" (Found) then destroy it, else call GetActiveDirectoryUser() function.
+            CheckSSOForActiveDirectoryAuthentication();
+
+            function ShowResult(result) {
+                ShowADConfiguration();
+
+                if ((result.Data != null || result.Data != "")) {
+                    var token = result.Token;
+                    if (token != null) {
+                        OTP = token;
+                    }
+
+                    if ((String)(result.Status).toUpperCase() == "FAILED" && result.Data != null) {
+                        var messages = (String)(result.Data).split('#');
+                        for (var i = 0; i < messages.length; i++) {
+                            var message = (String)(messages[i]).split(':');
+                            if (message != null && message && (String)(message).CustomStartsWith("Log") == false) {
+                                var controlId = (String)(message[0]);
+                                if (controlId != null && controlId != "") {
+                                    if (focusfieldId == "") {
+                                        focusfieldId = controlId.substring(0, controlId.indexOf('_'));
+                                    }
+                                    var control = $('#' + message[0]);
+                                    control.html(message[1]);
+                                }
+                            }
+                            else {
+                                if (messages[i] && (String)(messages[i]).CustomStartsWith("Log") == true) {
+                                    var log = (String)(messages[i]).replace(/Log~/g, '');
+                                    var log = (String)(log).replace("~", "");
+                                    if (log) {
+                                        //log = log.replace(/,/g, ':');
+                                        ShowLog(log);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (result.MessageTitle != "" && result.Message != "") {
+                            ShowMessageBox(result.MessageTitle, result.Message, result.MessageBoxIcon);
+                        }
+
+                        if (focusfieldId != "") {
+                            $('#' + focusfieldId).focus();
+                        }
+                        txtPassword.val('');
+                        return;
+                    }
+
+                    if (result.ReqdPasswordChange != undefined && (String)(result.ReqdPasswordChange).toUpperCase() == "TRUE") {
+                        if (result.RequireRedirect && result.Message == "") {
+                            if (result.RedirectPath != undefined && result.RedirectPath != null && result.RedirectPath != "") {
+                                var json = null;
+                                if (OTP != "") {
+                                    json = { 'OTP': OTP };
+                                }
+
+                                var path = result.RedirectPath.toUpperCase();
+                                if (path.CustomStartsWith('HTTP') || (json != null && json.OTP.length > 0)) {
+                                    Redirect(result.RedirectPath, json, "POST");
+                                }
+                                else {
+                                    Redirect(result.RedirectPath, json, "GET");
+                                }
+                            }
+                        }
+                        else if (result.RequireRedirect && result.Message && result.Message != "") {
+                           // BJ: 22022024 Remove model for showing OTP Message before redirecting to change password #NU1-T421
+                           var formData = {
+                               OTPMessage: result.Message,
+                               IsShowExtractImage: IsShowExtractImage,
+                                __RequestVerificationToken: getAntiForgeryToken()
+                            };
+                            $.ajax({
+                                url: '/Security/Login/SetOTPMessage',
+                                type: 'POST',
+                                data: formData,
+                                success: function (response) {
+                                    Redirect(result.RedirectPath, "", "GET");
+                                },
+                                error: function (xhr, status, error) {
+                                    console.log("Error: " + error);
+                                }
+                            });
+                           //Change Over
+
+
+                            //redirectPath = result.RedirectPath;
+                            //ShowMessageBox(result.MessageTitle, result.Message, result.MessageBoxIcon);
+                        }
+                        else if (result.Message && result.Message != "") {
+                            ShowMessageBox(result.MessageTitle, result.Message, result.MessageBoxIcon);
+                        }
+                    }
+                    else {
+                        if (result.RequireRedirect && result.Message == "") {
+                            if (result.RedirectPath != undefined && result.RedirectPath != null && result.RedirectPath != "") {
+                                //window.location.href = result.RedirectPath;
+                                var json = null;
+                                var path = result.RedirectPath.toUpperCase();
+                                if (path.CustomStartsWith('HTTP') || (json != null && json.length > 0)) {
+                                    Redirect(result.RedirectPath, json, "POST");
+                                }
+                                else {
+                                    if (getCookie("ENABLE_GOOGLE_ANALYTICS") == 'True') {
+                                        //AI:250920 function call for Google Analytics Login Event
+                                        PushGoogleAnalyticsData();
+                                    }
+                                    Redirect(result.RedirectPath, json, "GET");
+                                }
+                            }
+                        }
+                        else if (result.RequireRedirect && result.Message && result.Message != "") {
+                            redirectPath = result.RedirectPath;
+                            ShowMessageBox(result.MessageTitle, result.Message, result.MessageBoxIcon);
+                        }
+                        else if (result.Message && result.Message != "") {
+                            //SP:200921 JR1-T42 add check if show paynow button then need to open payment message box.
+                            if (result.IsShowPaynowButton) {
+                                $('#btnMessagePayNow').attr("href", result.Data);
+                                ShowPaymentMessageBox(result.MessageTitle, result.Message, result.MessageBoxIcon);
+                            }
+                            else {
+                                ShowMessageBox(result.MessageTitle, result.Message, result.MessageBoxIcon);
+                            }
+                        }
+                    }
+                }
+                else if (result.Message && result.Message != "") {
+                    ShowMessageBox(result.MessageTitle, result.Message, result.MessageBoxIcon);
+                    txtUsername.focus();
+                }
+            }
+
+            function PushGoogleAnalyticsData() {
+                //AI:220920 Google Analytics Login Event User Parameter Push to Datalayer
+                var username = getCookie("UserName");
+                if (username != "") {
+                    dataLayer.push({
+                        'event': 'Login'
+                    });
+                }
+            }
+
+            function ShowADConfiguration() {
+                if (IsConsoleLoggerEnabled == "True") {
+                    console.log("LDAP Path : " + LDAPPath);
+                    console.log("LDAP Property Name : " + LDAPPropertyName);
+                    console.log("Enabled AD Authentication On AD Site : " + IsCheckAuthOnADSite);
+                }
+            }
+
+            function ShowLog(log) {
+                var random = Math.floor(100000 + Math.random() * 900000);
+                var regex = /ADLog_/gi;
+                log = (String)(log).replace(regex, 'ADLog_' + random);
+                var scriptString = '<script type="text/javascript">{SCRIPT}' + "<" + "/" + "script>";
+                scriptString = scriptString.replace("{SCRIPT}", log);
+                $('head').append(scriptString);
+            }
+
+            //--------------------------------------------- Active Directory Code End -------------------------------------------------//
+
+            function SetClientNewsData() {
+                var apiPath = "/API/ACL/GetClientNews";
+                $.ajax({
+                    type: "POST",
+                    url: apiPath,
+                    success: function (result) {
+                        if (result != null && result != "") {
+                            if ((String)(result.Status).toUpperCase() == "SUCCESS") {
+                                if (result.Data.length == 1) {
+                                    document.getElementById('newsLink').innerHTML = result.Data[0].Title;
+                                    if (result.Data[0].NewsHtml.trim() != "") {
+                                        document.getElementById('newsHTML').innerHTML = result.Data[0].NewsHtml;
+                                    }
+                                    else
+                                    {
+                                        var link = document.getElementById('newsLink');
+                                        link.style.pointerEvents = 'none';
+                                    }
+                                    return true;
+                                }
+                                else
+                                {
+                                    document.getElementById('newsLink').innerText = "";
+                                    document.getElementById('newsHTML').innerText = "";
+                                    return true;
+                                }
+                            }
+                            else
+                            {
+                                document.getElementById('newsLink').innerText = "";
+                                document.getElementById('newsHTML').innerText = "";
+                                return true;
+                            }
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        //SliderDiv.html('<h3 class="NoNews">Failed to load news</h3>');
+                        return false;
+                    },
+                    complete: function () {
+                    }
+                });
+            }
+
+        });
+
+    </script>
+    <script>
+        // SMS:19062025 since cdn is not availbel then it will not run run ducument.ready where our actual form.login method is availbel so it will run "Login_form" which is default form in pure js but it is taking default get method so url is showing username and password so we handle this here.
+        // Pure JS fallback for login form
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.getElementById("Login_form");
+
+            if (form) {
+                form.addEventListener("submit", function (e) {
+                    e.preventDefault();
+
+                    // Check if jQuery is loaded since $ is the main jQuery object — if jQuery fails to load, $ doesn't exist.
+                    
+                    // If jQuery is loaded, let the existing jQuery logic handle it
+                    if (typeof checkCdnAccessJS !== 'undefined') {
+                        checkCdnAccessJS(function () {
+                            // jQuery form logic will now run since it's attached
+                            $("#Login_form").trigger("submit"); // Trigger jQuery handler
+                        }, function () {
+                            // CDN not accessible
+                            return false;
+                        });
+                    } else {
+                        return false;
+                    }
+                });
+            }
+        });
+    </script>
+
+
+    <div class="main">
+        <div class="login-bg-main bg-img">
+            <div class="login-screen-main">
+                <div class="col-lg-6 col-md-6">
+                    
+
+
+<style>
+    /*.Message-Font {
+        font-size: 1.3rem;
+    }*/
+
+    /*.password-control {
+        padding-right: 40px;
+    }*/
+
+    .companyQRCodeImg {
+        height: 85px;
+        width: 85px;
+    }
+
+    /*.store
+    {
+        height:40px;
+        margin-top:10px;
+    }*/
+
+    /*.topModalClass
+    {
+        top:109px !important;
+    }*/
+    .password {
+        font-size: 17px;
+        float: right;
+        margin-top: -30px;
+        margin-right: 10px;
+        opacity: 0.7;
+    }
+
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        SetLocalComputerIpAddress();
+        $('#microsoftSSOBtn').on('click', function (e) {
+            e.preventDefault();
+             const ssoUrl = '';
+            checkCdnAccessJS(
+                function () {
+                    window.location.href = ssoUrl;
+                },
+                function () {
+                    //Alert is popup in the actual checking
+                }
+            );
+        });
+    });
+
+    // JD : 27062024 >> NU1-T472 :Clear Azure load balancer cookies on signout
+    var clearCookie = function () {
+        document.cookie = "ApplicationGatewayAffinityCORS=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;secure;SameSite=none";
+        document.cookie = "ApplicationGatewayAffinity=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;SameSite=";
+    }
+
+</script>
+
+
+<div class="login-form-left">
+    
+<div class="modal fade bd-example-modal-lg" data-backdrop="static" tabindex="-1" role="dialog" id="MessageBox">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <div id="MessageBox_Modal_Header" class="modal-header">
+                <h5 class="modal-title" id="MessageTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="col pl-4" style="display: inline-flex;padding: 15px;">
+                    <span id="iconDiv">
+                    </span>
+                    <div id="Message" class="Modal-Body-text">
+
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="modal-footer justify-content-start">
+                <button type="button" class="btn btn-primary" id="MessageBox_btnOK" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--SP:200921 JR1-T42 Start Payment Message box-->
+<div class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" id="PaymentMessageBox">
+    <div class="modal-dialog modal-md modal-dialog-centered" id="DIV_25" style="max-width: 570px;">
+        <div class="modal-content" id="DIV_26" style="border-radius: 6px;">
+            <div id="MessageBox_Modal_Header" class="modal-header" style="padding: 15px;padding-left: 25px;">
+                <h5 class="modal-title" id="PaymentMessageTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="DIV_31" style="padding: 15px !important;padding-bottom: 15px !important;">
+                <div class="col pl-4">
+                    <span id="PaymenticonDiv">
+                    </span>
+                    <div id="PaymentMessage" class="Modal-Body-text">
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer" id="DIV_35" style="text-align: left;justify-content: start;border-top: white !important;padding-left: 25px;padding-bottom: 29px;">
+
+                <a class="btn btn-primary" id="btnMessagePayNow" target="_blank">Pay Now</a>
+                <button class="btn btn-secondary dismiss" data-dismiss="modal" type="button">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--End Payment Message box-->
+<style>
+    .text-Question {
+        color: #1569a5;
+    }
+     #PaymentMessage a{
+        font-size:15px !important;
+    }
+</style>
+
+<script type="text/javascript">
+    function ShowMessageBox(Title, message, MessageBoxIcon, MatchHeaderColorToTheme)
+    {
+        var icon = "NONE";
+        var iconHtml = '<span class="{0} float-left"></span>';
+        $('#iconDiv').css('display', 'block');
+        $('#Message').css('margin-left', '45px');
+
+        if (MatchHeaderColorToTheme && (String)(MatchHeaderColorToTheme).toUpperCase() == "TRUE")
+        {
+            //$('#MessageBox_Modal_Header').css('background-color', '#16224d');
+            //$('#MessageBox_btnOK').removeClass('btn-primary');
+            //$('#MessageBox_btnOK').css('background-color', '#292929');
+            //$('#MessageBox_btnOK').css('color', 'white');
+        }
+
+        MessageBoxIcon = (String)(MessageBoxIcon);
+        if (MessageBoxIcon == "" || MessageBoxIcon == null) {
+            icon = "NONE";
+        }
+        else {
+            icon = (String)(MessageBoxIcon).toUpperCase();
+        }
+
+        if (icon == "NONE" || icon == "2") {
+            iconHtml = "";
+            $('#iconDiv').css('display', 'none');
+            $('#Message').css('margin-left', '0px');
+        }
+        else if (icon == "ERROR" || icon == "0") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-times-circle text-danger");
+        }
+        else if (icon == "INFO" || icon == "1") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-info-circle text-dark");
+        }
+        else if (icon == "QUESTION" || icon == "3") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-question-circle text-Question");
+        }
+        else if (icon == "WARNING" || icon == "4") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-exclamation-triangle text-warning");
+        }
+        else if (icon == "SUCCESS" || icon == "5") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-check-circle text-success");
+        }
+        //SP:140722 added code for change title as per niraj sir suggestions.
+        if (Title.includes("Invalid values") || Title.includes("Warning Message") || Title.includes("Error occured while saving the record") || Title.includes("Error")) {
+            Title = "Operation cannot be performed";
+        }
+        $('#MessageTitle').html(Title);
+        $('#iconDiv').html(iconHtml);
+        $('#Message').html(message);
+        $('#MessageBox').modal('show');
+    }
+    //SP:200921 task : JR1-T42 - plan subscription added new function for show paynow button message box when payment due date over.
+    function ShowPaymentMessageBox(Title, message, MessageBoxIcon, MatchHeaderColorToTheme) {
+        var icon = "NONE";
+        var iconHtml = '<span class="{0} float-left"></span>';
+        $('#PaymenticonDiv').css('display', 'block');
+        $('#PaymentMessage').css('margin-left', '45px');
+
+        if (MatchHeaderColorToTheme && (String)(MatchHeaderColorToTheme).toUpperCase() == "TRUE") {
+            
+        }
+
+        MessageBoxIcon = (String)(MessageBoxIcon);
+        if (MessageBoxIcon == "" || MessageBoxIcon == null) {
+            icon = "NONE";
+        }
+        else {
+            icon = (String)(MessageBoxIcon).toUpperCase();
+        }
+
+        if (icon == "NONE" || icon == "2") {
+            iconHtml = "";
+            $('#PaymenticonDiv').css('display', 'none');
+            $('#PaymentMessage').css('margin-left', '0px');
+        }
+        else if (icon == "ERROR" || icon == "0") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-times-circle text-danger");
+        }
+        else if (icon == "INFO" || icon == "1") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-info-circle text-dark");
+        }
+        else if (icon == "QUESTION" || icon == "3") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-question-circle text-Question");
+        }
+        else if (icon == "WARNING" || icon == "4") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-exclamation-triangle text-warning");
+        }
+        else if (icon == "SUCCESS" || icon == "5") {
+            iconHtml = iconHtml.replace("{0}", "fa fa-check-circle text-success");
+        }
+
+        $('#PaymentMessageTitle').html(Title);
+        $('#PaymenticonDiv').html(iconHtml);
+        $('#PaymentMessage').html(message);
+        $('#PaymentMessageBox').modal('show');
+    }
+</script>
+    <input name="__RequestVerificationToken" type="hidden" value="G7BkI6I1SXpSLi3SkoD0_13lauVW1eiyqINLQBH0sv0H-eaxxGF57MyaRlO95-ZXFODTmtQ2ab5I_TC-CxOou5PDtPzzp5Rckd5UtQFpx541" />
+    <div class="compay-logo-preview">
+        <img src="/CompanyImageLoad.ashx?attachmentId=fc8cb2e7-deb9-4724-b855-3b49ffa8ddf3&amp;key=51ab8052e63f4f1aa3762c45884b90cb&amp;client=broseindia">
+        <h3>Brose India Automotive Systems Pvt Ltd </h3>
+    </div>
+    <h6 class="text-center"><a href="javascript:;" id="newsLink" data-target="#Document_Information_Modal" data-toggle="modal" style="font-size: 13px;font-weight: bold;"></a></h6>
+    <form class="login-form" id="Login_form">    
+            
+        <div class="new-ui-sing-box mb-3 p-0">
+            
+            <input Value="" autocomplete="off" class="form-control" id="txtUsername" name="txtUsername" placeholder="Username or EmpCode" type="text" value="" />
+        </div>
+        <div class="new-ui-sing-box mb-2 p-0" style="position: relative;">
+            <input autocomplete="off" class="form-control password-control" data-password-viewicon-id="PasswordViewIcon" id="txtPassword" name="txtPassword" placeholder="Password" type="password" />
+            <span id="togglePassword" title="Show password" class="far fa-eye password" data-password-field-id="txtPassword"></span>
+        </div>
+        <div class="trouble_logging text-right">
+            
+            <a href="/broseindia/Security/Login/ForgotPassword">Forgot Password?</a>
+        </div>
+        
+        <div class="new-ui-sing-box mt-3 p-0">
+            <button type="submit" id="btnLogin" class="btn btn-primary Login-button mt-0">Login</button>
+        </div>
+    </form>
+        
+    
+    
+    <div class="modal fade additional-filter-modal configure-modal" id="Document_Information_Modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered max-600" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Information</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="modal-body sample-modal-body">
+                    <div class="login-document-details w-100" id="newsHTML">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+                </div>
+                <div id="News" class="col-lg-6 col-md-6">
+                    <div class="login-rh-main-bg">
+                        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                            <ol class="carousel-indicators">
+                                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                                <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                                <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                                <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+                                <li data-target="#carouselExampleIndicators" data-slide-to="4"></li>
+                                <li data-target="#carouselExampleIndicators" data-slide-to="5"></li>
+                                <li data-target="#carouselExampleIndicators" data-slide-to="6"></li>
+                            </ol>
+                            <div class="login-new-slider carousel-inner">
+                                <div class="login-sing-slide carousel-item active">
+                                    <img src="https://appfactohrcom2022-1c175.kxcdn.com//Resources/Sign-Up/images/New/SliderImage/Attendance-Shift-Leave-Management.png">
+                                </div>
+                                <div class="login-sing-slide carousel-item">
+                                    <img src="https://appfactohrcom2022-1c175.kxcdn.com//Resources/Sign-Up/images/New/SliderImage/Travel-Claim-Reimbursement.png">
+                                </div>
+                                <div class="login-sing-slide carousel-item">
+                                    <img src="https://appfactohrcom2022-1c175.kxcdn.com//Resources/Sign-Up/images/New/SliderImage/Performance-Management.png">
+                                </div>
+                                <div class="login-sing-slide carousel-item">
+                                    <img src="https://appfactohrcom2022-1c175.kxcdn.com//Resources/Sign-Up/images/New/SliderImage/Acknowledgment-Survey.png">
+                                </div>
+                                <div class="login-sing-slide carousel-item">
+                                    <img src="https://appfactohrcom2022-1c175.kxcdn.com//Resources/Sign-Up/images/New/SliderImage/Ticketing-System.png">
+                                </div>
+                                <div class="login-sing-slide carousel-item">
+                                    <img src="https://appfactohrcom2022-1c175.kxcdn.com//Resources/Sign-Up/images/New/SliderImage/Selfie-Punch-with-Location-Geo-Fencing.png">
+                                </div>
+                                <div class="login-sing-slide carousel-item">
+                                    <img src="https://appfactohrcom2022-1c175.kxcdn.com//Resources/Sign-Up/images/New/SliderImage/Chatbot.png">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="login-copyright flex-nowrap">
+                <div class="login-copyright-dtl w-auto">
+                    <p>Powered By</p>
+                    <img src="https://appfactohrcom2022-1c175.kxcdn.com//Content/images/factoHR-Logo.png">
+                </div>
+                <div class="copyright-dtl pl-3">
+                    <p id="copyright">Copyright</p>
+                    <p>By logging in, you agree to factohr <a href="https://factohr.com/terms-of-service/?utm_source=product_login_page&utm_medium=factohr_terms_of_service&utm_campaign=factohr_terms_of_service" class="mr-1" target="_blank">Terms of Service </a> & <a href="https://factohr.com/privacy-policy/?utm_source=product_login_page&utm_medium=factohr_privacy_policy&utm_campaign=factohr_privacy_policy" class="mr-1" target="_blank">Privacy Policy</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

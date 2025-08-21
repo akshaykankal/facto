@@ -1,0 +1,1593 @@
+{
+  "name": "Bravo Personal Assistant - Master Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "workflowActivate"
+        ]
+      },
+      "id": "start-trigger",
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "triggerAtMinute": 5
+            }
+          ]
+        }
+      },
+      "id": "cron-5min",
+      "name": "Every 5 Minutes",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 500]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bravo-webhook",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-receiver",
+      "name": "Webhook Receiver",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 700]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"trigger_type\"]}}",
+              "operation": "equals",
+              "value2": "voice_command"
+            }
+          ]
+        }
+      },
+      "id": "check-voice",
+      "name": "Is Voice Command?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 700]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "download",
+        "fileId": "={{$json[\"voice_file_id\"]}}"
+      },
+      "id": "download-voice",
+      "name": "Download Voice File",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [650, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/audio/transcriptions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$credentials.openai_api_key}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "model",
+              "value": "whisper-1"
+            }
+          ]
+        }
+      },
+      "id": "whisper-transcribe",
+      "name": "Whisper Transcribe",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [850, 600]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4-turbo-preview",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are Bravo, a personal assistant. Parse this command and return a JSON object with: {\"action\": \"action_type\", \"category\": \"category\", \"details\": {}}"
+            },
+            {
+              "role": "user",
+              "content": "={{$json[\"text\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "responseFormat": "json_object"
+        }
+      },
+      "id": "gpt4-parse-command",
+      "name": "GPT-4 Parse Command",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [1050, 700]
+    },
+    {
+      "parameters": {
+        "functionCode": "const command = JSON.parse($input.first().json.choices[0].message.content);\n\nswitch(command.action) {\n  case 'add_task':\n    return [{json: {...command, workflow: 'task_management'}}];\n  case 'financial_query':\n    return [{json: {...command, workflow: 'financial_processing'}}];\n  case 'schedule_meeting':\n    return [{json: {...command, workflow: 'calendar_management'}}];\n  case 'employee_action':\n    return [{json: {...command, workflow: 'hr_management'}}];\n  case 'client_action':\n    return [{json: {...command, workflow: 'client_management'}}];\n  case 'health_query':\n    return [{json: {...command, workflow: 'health_tracking'}}];\n  default:\n    return [{json: {...command, workflow: 'general_query'}}];\n}"
+      },
+      "id": "route-command",
+      "name": "Route Command",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 700]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"workflow\"]}}",
+              "operation": "equals",
+              "value2": "task_management"
+            }
+          ]
+        }
+      },
+      "id": "is-task-mgmt",
+      "name": "Task Management?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 400]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "append",
+        "sheetId": "{{$credentials.tasks_sheet_id}}",
+        "range": "Tasks!A:H",
+        "dataMode": "autoMapInputData",
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      },
+      "id": "add-to-tasks",
+      "name": "Add to Tasks Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "resource": "event",
+        "operation": "create",
+        "calendar": "primary",
+        "summary": "={{$json[\"details\"][\"title\"]}}",
+        "start": "={{$json[\"details\"][\"due_date\"]}}",
+        "end": "={{$json[\"details\"][\"due_date\"]}}",
+        "options": {
+          "description": "={{$json[\"details\"][\"description\"]}}",
+          "reminders": {
+            "useDefault": false,
+            "overrides": [
+              {
+                "method": "popup",
+                "minutes": 15
+              }
+            ]
+          }
+        }
+      },
+      "id": "create-calendar-event",
+      "name": "Create Calendar Event",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"workflow\"]}}",
+              "operation": "equals",
+              "value2": "financial_processing"
+            }
+          ]
+        }
+      },
+      "id": "is-financial",
+      "name": "Financial Processing?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 600]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "hourly-trigger",
+      "name": "Hourly Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 900]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "message",
+        "operation": "getAll",
+        "q": "is:unread from:bank OR from:payment OR subject:transaction",
+        "options": {
+          "includeSpamTrash": false
+        }
+      },
+      "id": "check-gmail-transactions",
+      "name": "Check Gmail Transactions",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [450, 900]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4-turbo-preview",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Extract transaction details from this email and return JSON: {\"amount\": number, \"type\": \"credit/debit\", \"category\": \"string\", \"description\": \"string\", \"date\": \"YYYY-MM-DD\", \"account\": \"string\"}"
+            },
+            {
+              "role": "user",
+              "content": "={{$json[\"snippet\"]}}"
+            }
+          ]
+        },
+        "options": {
+          "responseFormat": "json_object"
+        }
+      },
+      "id": "extract-transaction",
+      "name": "Extract Transaction Details",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [650, 900]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "append",
+        "sheetId": "{{$credentials.finance_sheet_id}}",
+        "range": "Transactions!A:G",
+        "dataMode": "autoMapInputData"
+      },
+      "id": "log-transaction",
+      "name": "Log Transaction",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [850, 900]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1,
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "id": "daily-morning",
+      "name": "Daily Morning Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 1100]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "get",
+        "sheetId": "{{$credentials.health_sheet_id}}",
+        "range": "HealthData!A:Z",
+        "options": {
+          "returnAllMatches": true
+        }
+      },
+      "id": "get-health-data",
+      "name": "Get Health Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [450, 1100]
+    },
+    {
+      "parameters": {
+        "resource": "event",
+        "operation": "getAll",
+        "calendar": "primary",
+        "timeMin": "={{$today}}",
+        "timeMax": "={{$today.plus({days: 1}).toISO()}}",
+        "options": {
+          "singleEvents": true,
+          "orderBy": "startTime"
+        }
+      },
+      "id": "get-todays-events",
+      "name": "Get Today's Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [650, 1100]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "get",
+        "sheetId": "{{$credentials.tasks_sheet_id}}",
+        "range": "Tasks!A:H",
+        "filters": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Pending"
+            }
+          ]
+        }
+      },
+      "id": "get-pending-tasks",
+      "name": "Get Pending Tasks",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [850, 1100]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4-turbo-preview",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are Bravo. Create a personalized morning briefing based on health data, calendar, and tasks. Include actionable insights and energy optimization suggestions."
+            },
+            {
+              "role": "user",
+              "content": "Health: {{$node[\"Get Health Data\"].json}}\nCalendar: {{$node[\"Get Today's Events\"].json}}\nTasks: {{$node[\"Get Pending Tasks\"].json}}"
+            }
+          ]
+        }
+      },
+      "id": "generate-briefing",
+      "name": "Generate Morning Briefing",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [1050, 1100]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "channel": "#general",
+        "text": "🌅 Good Morning Akshay! Here's your briefing:\n\n{{$json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "options": {
+          "username": "Bravo Assistant",
+          "icon_emoji": ":robot_face:"
+        }
+      },
+      "id": "send-briefing-slack",
+      "name": "Send Briefing to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1250, 1100]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"workflow\"]}}",
+              "operation": "equals",
+              "value2": "hr_management"
+            }
+          ]
+        }
+      },
+      "id": "is-hr",
+      "name": "HR Management?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 800]
+    },
+    {
+      "parameters": {
+        "functionCode": "const hrAction = $input.first().json;\n\nif (hrAction.details.action === 'hire') {\n  // Prepare onboarding data\n  return [{\n    json: {\n      name: hrAction.details.name,\n      position: hrAction.details.position,\n      email: hrAction.details.email,\n      start_date: hrAction.details.start_date || new Date().toISOString(),\n      duration: hrAction.details.duration || 'Permanent',\n      company: hrAction.details.company || 'Varnilix Private Limited'\n    }\n  }];\n}\n\nreturn [hrAction];"
+      },
+      "id": "process-hr-action",
+      "name": "Process HR Action",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 800]
+    },
+    {
+      "parameters": {
+        "fromEmail": "hr@varnilix.com",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "Welcome to {{$json[\"company\"]}}!",
+        "emailType": "html",
+        "message": "<h2>Welcome {{$json[\"name\"]}}!</h2>\n<p>We're excited to have you join our team as {{$json[\"position\"]}}.</p>\n<p>Your start date is {{$json[\"start_date\"]}}.</p>\n<p>Please find attached your onboarding documents.</p>\n<p>Best regards,<br>HR Team</p>",
+        "options": {
+          "ccEmail": "akshay@varnilix.com"
+        }
+      },
+      "id": "send-welcome-email",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1850, 800]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "append",
+        "sheetId": "{{$credentials.employees_sheet_id}}",
+        "range": "Employees!A:F"
+      },
+      "id": "add-employee-record",
+      "name": "Add Employee Record",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [2050, 800]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 7,
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "id": "weekly-client-check",
+      "name": "Weekly Client Check",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 1300]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll",
+        "sheetId": "{{$credentials.clients_sheet_id}}",
+        "range": "Clients!A:G"
+      },
+      "id": "get-clients",
+      "name": "Get All Clients",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [450, 1300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const clients = $input.all();\nconst today = new Date();\nconst followUpClients = [];\n\nclients.forEach(client => {\n  const lastContact = new Date(client.json.last_contact);\n  const daysSinceContact = Math.floor((today - lastContact) / (1000 * 60 * 60 * 24));\n  \n  if (daysSinceContact > 7) {\n    followUpClients.push({\n      json: {\n        ...client.json,\n        days_inactive: daysSinceContact,\n        follow_up_needed: true\n      }\n    });\n  }\n});\n\nreturn followUpClients;"
+      },
+      "id": "identify-followups",
+      "name": "Identify Follow-ups Needed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 1300]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4-turbo-preview",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Generate a personalized follow-up email for a client. Be professional, warm, and reference their business context."
+            },
+            {
+              "role": "user",
+              "content": "Client: {{$json[\"name\"]}}\nCompany: {{$json[\"company\"]}}\nLast Project: {{$json[\"last_project\"]}}\nDays Inactive: {{$json[\"days_inactive\"]}}"
+            }
+          ]
+        }
+      },
+      "id": "generate-followup",
+      "name": "Generate Follow-up Email",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [850, 1300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "sales@varnilix.com",
+        "toEmail": "={{$json[\"email\"]}}",
+        "subject": "Quick Check-in from Varnilix",
+        "message": "={{$json[\"choices\"][0][\"message\"][\"content\"]}}",
+        "options": {
+          "replyTo": "akshay@varnilix.com"
+        }
+      },
+      "id": "send-followup",
+      "name": "Send Follow-up Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1050, 1300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "weeksInterval": 1,
+              "triggerAtDay": [1],
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "weekly-lead-gen",
+      "name": "Weekly Lead Generation",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 1500]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.perplexity.ai/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{$credentials.perplexity_api_key}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "pplx-70b-online"
+            },
+            {
+              "name": "messages",
+              "value": "[{\"role\": \"user\", \"content\": \"Find 10 software development companies in Pune, India that might need development services. Include company name, website, and brief description.\"}]"
+            }
+          ]
+        }
+      },
+      "id": "perplexity-lead-search",
+      "name": "Perplexity Lead Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [450, 1500]
+    },
+    {
+      "parameters": {
+        "functionCode": "const response = $input.first().json;\nconst content = response.choices[0].message.content;\n\n// Parse the leads from Perplexity response\nconst leads = [];\nconst lines = content.split('\\n');\n\nlines.forEach(line => {\n  if (line.includes('Company:') || line.includes('1.') || line.includes('2.')) {\n    // Extract company info\n    leads.push({\n      json: {\n        company_name: line.match(/Company: (.+?) -/)?.[1] || line,\n        status: 'New',\n        source: 'Perplexity Research',\n        date_added: new Date().toISOString(),\n        assigned_to: 'Akshay'\n      }\n    });\n  }\n});\n\nreturn leads;"
+      },
+      "id": "parse-leads",
+      "name": "Parse Leads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 1500]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "append",
+        "sheetId": "{{$credentials.leads_sheet_id}}",
+        "range": "Leads!A:E",
+        "dataMode": "autoMapInputData"
+      },
+      "id": "save-leads",
+      "name": "Save Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [850, 1500]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "channel": "#sales",
+        "text": "🎯 New leads added!\n\nFound {{$items.length}} new potential clients.\nCheck the Leads sheet for details.",
+        "options": {
+          "username": "Bravo Lead Gen"
+        }
+      },
+      "id": "notify-new-leads",
+      "name": "Notify New Leads",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1050, 1500]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "monthsInterval": 1,
+              "triggerAtDayOfMonth": 1,
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "id": "monthly-financial-review",
+      "name": "Monthly Financial Review",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 1700]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll",
+        "sheetId": "{{$credentials.finance_sheet_id}}",
+        "range": "Transactions!A:G",
+        "options": {
+          "returnAllMatches": true
+        }
+      },
+      "id": "get-monthly-transactions",
+      "name": "Get Monthly Transactions",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [450, 1700]
+    },
+    {
+      "parameters": {
+        "functionCode": "const transactions = $input.all();\nconst analysis = {\n  total_income: 0,\n  total_expenses: 0,\n  by_category: {},\n  by_company: {}\n};\n\ntransactions.forEach(t => {\n  const amount = parseFloat(t.json.amount);\n  const category = t.json.category;\n  const company = t.json.company || 'Personal';\n  \n  if (t.json.type === 'credit') {\n    analysis.total_income += amount;\n  } else {\n    analysis.total_expenses += amount;\n    \n    if (!analysis.by_category[category]) {\n      analysis.by_category[category] = 0;\n    }\n    analysis.by_category[category] += amount;\n  }\n  \n  if (!analysis.by_company[company]) {\n    analysis.by_company[company] = {income: 0, expenses: 0};\n  }\n  \n  if (t.json.type === 'credit') {\n    analysis.by_company[company].income += amount;\n  } else {\n    analysis.by_company[company].expenses += amount;\n  }\n});\n\nanalysis.net_profit = analysis.total_income - analysis.total_expenses;\nanalysis.savings_rate = (analysis.net_profit / analysis.total_income * 100).toFixed(2);\n\nreturn [{json: analysis}];"
+      },
+      "id": "analyze-finances",
+      "name": "Analyze Finances",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 1700]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4-turbo-preview",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are the Finance Lead for Bravo. Analyze this financial data and provide:\n1. Key insights\n2. Areas of concern\n3. Optimization recommendations\n4. Revenue growth strategies\n5. Next month's forecast"
+            },
+            {
+              "role": "user",
+              "content": "{{JSON.stringify($json)}}"
+            }
+          ]
+        }
+      },
+      "id": "finance-lead-analysis",
+      "name": "Finance Lead Analysis",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [850, 1700]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "append",
+        "sheetId": "{{$credentials.reports_sheet_id}}",
+        "range": "MonthlyReports!A:D",
+        "dataMode": "defineBelow",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Date",
+              "fieldValue": "={{new Date().toISOString()}}"
+            },
+            {
+              "column": "Type",
+              "fieldValue": "Financial Analysis"
+            },
+            {
+              "column": "Summary",
+              "fieldValue": "={{$json.analysis}}"
+            },
+            {
+              "column": "Full_Report",
+              "fieldValue": "={{$json.choices[0].message.content}}"
+            }
+          ]
+        }
+      },
+      "id": "save-financial-report",
+      "name": "Save Financial Report",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [1050, 1700]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "channel": "#finance",
+        "text": "💰 Monthly Financial Report Ready!\n\n{{$node[\"Finance Lead Analysis\"].json.choices[0].message.content}}\n\n📊 Full details saved in Reports sheet.",
+        "options": {
+          "username": "Bravo Finance Lead"
+        }
+      },
+      "id": "send-financial-report",
+      "name": "Send Financial Report",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1250, 1700]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"workflow\"]}}",
+              "operation": "equals",
+              "value2": "health_tracking"
+            }
+          ]
+        }
+      },
+      "id": "is-health",
+      "name": "Health Tracking?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 1000]
+    },
+    {
+      "parameters": {
+        "functionCode": "// This would integrate with Apple Health via shortcuts\n// For now, we'll simulate health data processing\n\nconst healthQuery = $input.first().json;\nconst mockHealthData = {\n  sleep_hours: 7.5,\n  steps: 8500,\n  heart_rate_avg: 72,\n  hrv: 45,\n  exercise_minutes: 30,\n  water_intake: 2.5,\n  stress_level: 'medium'\n};\n\n// Analyze health patterns\nconst analysis = {\n  energy_level: mockHealthData.sleep_hours >= 7 ? 'Good' : 'Low',\n  recommendations: [],\n  work_optimization: {}\n};\n\nif (mockHealthData.sleep_hours < 7) {\n  analysis.recommendations.push('Consider lighter schedule today due to low sleep');\n}\n\nif (mockHealthData.stress_level === 'high') {\n  analysis.recommendations.push('Schedule breaks between meetings');\n}\n\nif (mockHealthData.steps < 5000) {\n  analysis.recommendations.push('Add walking meeting or standing desk time');\n}\n\nanalysis.work_optimization.best_focus_time = mockHealthData.sleep_hours >= 7 ? '9-11 AM' : '10-12 PM';\nanalysis.work_optimization.recommended_break_frequency = 'Every 45 minutes';\n\nreturn [{json: {healthData: mockHealthData, analysis}}];"
+      },
+      "id": "process-health-data",
+      "name": "Process Health Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 1000]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "append",
+        "sheetId": "{{$credentials.health_sheet_id}}",
+        "range": "HealthData!A:H",
+        "dataMode": "defineBelow",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Date",
+              "fieldValue": "={{new Date().toISOString()}}"
+            },
+            {
+              "column": "Sleep_Hours",
+              "fieldValue": "={{$json.healthData.sleep_hours}}"
+            },
+            {
+              "column": "Steps",
+              "fieldValue": "={{$json.healthData.steps}}"
+            },
+            {
+              "column": "Heart_Rate",
+              "fieldValue": "={{$json.healthData.heart_rate_avg}}"
+            },
+            {
+              "column": "Energy_Level",
+              "fieldValue": "={{$json.analysis.energy_level}}"
+            }
+          ]
+        }
+      },
+      "id": "log-health-data",
+      "name": "Log Health Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [1850, 1000]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "project-check-trigger",
+      "name": "Project Check Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 1900]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll",
+        "sheetId": "{{$credentials.projects_sheet_id}}",
+        "range": "Projects!A:H",
+        "filters": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Active"
+            }
+          ]
+        }
+      },
+      "id": "get-active-projects",
+      "name": "Get Active Projects",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [450, 1900]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "issue",
+        "operation": "getAll",
+        "owner": "={{$json.github_repo_owner}}",
+        "repository": "={{$json.github_repo_name}}",
+        "returnAll": false,
+        "limit": 10
+      },
+      "id": "check-github-issues",
+      "name": "Check GitHub Issues",
+      "type": "n8n-nodes-base.github",
+      "typeVersion": 1,
+      "position": [650, 1900]
+    },
+    {
+      "parameters": {
+        "functionCode": "const projects = $input.all();\nconst alerts = [];\nconst today = new Date();\n\nprojects.forEach(project => {\n  const deadline = new Date(project.json.deadline);\n  const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));\n  \n  if (daysUntilDeadline <= 2) {\n    alerts.push({\n      json: {\n        project_name: project.json.name,\n        client: project.json.client,\n        deadline: project.json.deadline,\n        days_remaining: daysUntilDeadline,\n        priority: 'HIGH',\n        github_issues: project.json.github_issues || 0\n      }\n    });\n  }\n});\n\nreturn alerts;"
+      },
+      "id": "identify-urgent-projects",
+      "name": "Identify Urgent Projects",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 1900]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "channel": "#projects",
+        "text": "🚨 Urgent Project Alert!\n\nProject: {{$json.project_name}}\nClient: {{$json.client}}\nDeadline: {{$json.deadline}}\nDays Remaining: {{$json.days_remaining}}\n\nPlease prioritize this project!",
+        "options": {
+          "username": "Bravo Project Manager"
+        }
+      },
+      "id": "alert-urgent-project",
+      "name": "Alert Urgent Project",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1050, 1900]
+    },
+    {
+      "parameters": {
+        "errorTriggerLevel": "all",
+        "worfklowIds": "={{$workflow.id}}"
+      },
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [250, 2100]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "channel": "#errors",
+        "text": "⚠️ Workflow Error!\n\nWorkflow: {{$workflow.name}}\nNode: {{$json.node.name}}\nError: {{$json.error.message}}\nTime: {{$json.timestamp}}",
+        "options": {
+          "username": "Bravo Error Handler"
+        }
+      },
+      "id": "notify-error",
+      "name": "Notify Error",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [450, 2100]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "append",
+        "sheetId": "{{$credentials.logs_sheet_id}}",
+        "range": "ErrorLogs!A:D",
+        "dataMode": "defineBelow",
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Timestamp",
+              "fieldValue": "={{$json.timestamp}}"
+            },
+            {
+              "column": "Workflow",
+              "fieldValue": "={{$workflow.name}}"
+            },
+            {
+              "column": "Node",
+              "fieldValue": "={{$json.node.name}}"
+            },
+            {
+              "column": "Error",
+              "fieldValue": "={{$json.error.message}}"
+            }
+          ]
+        }
+      },
+      "id": "log-error",
+      "name": "Log Error",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [650, 2100]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bravo-memory-query",
+        "responseMode": "onReceived"
+      },
+      "id": "memory-query-webhook",
+      "name": "Memory Query Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 2300]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "lookup",
+        "sheetId": "{{$credentials.memory_sheet_id}}",
+        "range": "Memory!A:E",
+        "lookupColumn": "Type",
+        "lookupValue": "={{$json.query_type}}",
+        "options": {
+          "returnAllMatches": true
+        }
+      },
+      "id": "search-memory",
+      "name": "Search Memory",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 3,
+      "position": [450, 2300]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4-turbo-preview",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are Bravo's memory system. Provide relevant information based on the query and historical data."
+            },
+            {
+              "role": "user",
+              "content": "Query: {{$json.query}}\nMemory Data: {{JSON.stringify($json.memory_results)}}"
+            }
+          ]
+        }
+      },
+      "id": "process-memory-query",
+      "name": "Process Memory Query",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [650, 2300]
+    },
+    {
+      "parameters": {
+        "mode": "responseData",
+        "responseData": "={{$json.choices[0].message.content}}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "return-memory-result",
+      "name": "Return Memory Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [850, 2300]
+    }
+  ],
+  "connections": {
+    "start-trigger": {
+      "main": [
+        [
+          {
+            "node": "check-gmail-transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cron-5min": {
+      "main": [
+        [
+          {
+            "node": "check-gmail-transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "webhook-receiver": {
+      "main": [
+        [
+          {
+            "node": "check-voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check-voice": {
+      "main": [
+        [
+          {
+            "node": "download-voice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "gpt4-parse-command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "download-voice": {
+      "main": [
+        [
+          {
+            "node": "whisper-transcribe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "whisper-transcribe": {
+      "main": [
+        [
+          {
+            "node": "gpt4-parse-command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gpt4-parse-command": {
+      "main": [
+        [
+          {
+            "node": "route-command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "route-command": {
+      "main": [
+        [
+          {
+            "node": "is-task-mgmt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "is-financial",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "is-hr",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "is-health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is-task-mgmt": {
+      "main": [
+        [
+          {
+            "node": "add-to-tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add-to-tasks": {
+      "main": [
+        [
+          {
+            "node": "create-calendar-event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is-financial": {
+      "main": [
+        [
+          {
+            "node": "analyze-finances",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "hourly-trigger": {
+      "main": [
+        [
+          {
+            "node": "check-gmail-transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check-gmail-transactions": {
+      "main": [
+        [
+          {
+            "node": "extract-transaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "extract-transaction": {
+      "main": [
+        [
+          {
+            "node": "log-transaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "daily-morning": {
+      "main": [
+        [
+          {
+            "node": "get-health-data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "get-todays-events",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "get-pending-tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-health-data": {
+      "main": [
+        [
+          {
+            "node": "generate-briefing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-todays-events": {
+      "main": [
+        [
+          {
+            "node": "generate-briefing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-pending-tasks": {
+      "main": [
+        [
+          {
+            "node": "generate-briefing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate-briefing": {
+      "main": [
+        [
+          {
+            "node": "send-briefing-slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is-hr": {
+      "main": [
+        [
+          {
+            "node": "process-hr-action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process-hr-action": {
+      "main": [
+        [
+          {
+            "node": "send-welcome-email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send-welcome-email": {
+      "main": [
+        [
+          {
+            "node": "add-employee-record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "weekly-client-check": {
+      "main": [
+        [
+          {
+            "node": "get-clients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-clients": {
+      "main": [
+        [
+          {
+            "node": "identify-followups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "identify-followups": {
+      "main": [
+        [
+          {
+            "node": "generate-followup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate-followup": {
+      "main": [
+        [
+          {
+            "node": "send-followup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "weekly-lead-gen": {
+      "main": [
+        [
+          {
+            "node": "perplexity-lead-search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "perplexity-lead-search": {
+      "main": [
+        [
+          {
+            "node": "parse-leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "parse-leads": {
+      "main": [
+        [
+          {
+            "node": "save-leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save-leads": {
+      "main": [
+        [
+          {
+            "node": "notify-new-leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "monthly-financial-review": {
+      "main": [
+        [
+          {
+            "node": "get-monthly-transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-monthly-transactions": {
+      "main": [
+        [
+          {
+            "node": "analyze-finances",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "analyze-finances": {
+      "main": [
+        [
+          {
+            "node": "finance-lead-analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "finance-lead-analysis": {
+      "main": [
+        [
+          {
+            "node": "save-financial-report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save-financial-report": {
+      "main": [
+        [
+          {
+            "node": "send-financial-report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is-health": {
+      "main": [
+        [
+          {
+            "node": "process-health-data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process-health-data": {
+      "main": [
+        [
+          {
+            "node": "log-health-data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "project-check-trigger": {
+      "main": [
+        [
+          {
+            "node": "get-active-projects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-active-projects": {
+      "main": [
+        [
+          {
+            "node": "check-github-issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check-github-issues": {
+      "main": [
+        [
+          {
+            "node": "identify-urgent-projects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "identify-urgent-projects": {
+      "main": [
+        [
+          {
+            "node": "alert-urgent-project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "error-trigger": {
+      "main": [
+        [
+          {
+            "node": "notify-error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "notify-error": {
+      "main": [
+        [
+          {
+            "node": "log-error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "memory-query-webhook": {
+      "main": [
+        [
+          {
+            "node": "search-memory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "search-memory": {
+      "main": [
+        [
+          {
+            "node": "process-memory-query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process-memory-query": {
+      "main": [
+        [
+          {
+            "node": "return-memory-result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "error-handler-workflow-id"
+  },
+  "staticData": null,
+  "pinData": {},
+  "versionId": "1.0.0",
+  "triggerCount": 8
+}

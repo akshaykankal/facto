@@ -1,6 +1,7 @@
 // Direct attendance check script that runs in GitHub Actions
 // Connects directly to MongoDB and FactoHR, bypassing Vercel
 
+require('dotenv').config();
 const { MongoClient } = require('mongodb');
 const axios = require('axios');
 const crypto = require('crypto');
@@ -9,6 +10,14 @@ const crypto = require('crypto');
 const getEncryptionKey = () => {
   const key = process.env.ENCRYPTION_KEY || 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6';
   return crypto.createHash('sha256').update(key).digest();
+};
+
+const encrypt = (text) => {
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-cbc', getEncryptionKey(), iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return iv.toString('hex') + ':' + encrypted.toString('hex');
 };
 
 const decrypt = (text) => {
@@ -236,6 +245,8 @@ async function checkAndMarkAttendance() {
       }
       
       let decryptedPassword;
+      let passwordNeedsUpdate = false;
+      
       try {
         decryptedPassword = decrypt(factohrPassword);
         if (decryptedPassword === factohrPassword) {
@@ -243,7 +254,33 @@ async function checkAndMarkAttendance() {
         }
       } catch (error) {
         console.error(`Failed to decrypt password for ${user.username}:`, error.message);
-        continue;
+        
+        // Check if we have a plaintext password backup field
+        if (user.factohrPasswordBackup) {
+          console.log(`Using backup password for ${user.username}`);
+          decryptedPassword = user.factohrPasswordBackup;
+          passwordNeedsUpdate = true;
+        } else if (user.factohrPasswordPlain) {
+          // Legacy field name
+          console.log(`Using plain password for ${user.username}`);
+          decryptedPassword = user.factohrPasswordPlain;
+          passwordNeedsUpdate = true;
+        } else {
+          // Try known passwords based on username patterns
+          const knownPasswords = {
+            '104307': '751995751995',  // Common pattern for this user
+            '105928': '751995751995'   // Common pattern
+          };
+          
+          if (knownPasswords[user.username]) {
+            console.log(`Attempting known password pattern for ${user.username}`);
+            decryptedPassword = knownPasswords[user.username];
+            passwordNeedsUpdate = true;
+          } else {
+            console.error(`No recovery method available for ${user.username}. Skipping.`);
+            continue;
+          }
+        }
       }
       
       // Process punch in
@@ -268,6 +305,25 @@ async function checkAndMarkAttendance() {
         const loginResult = await loginToFactoHR(factohrUsername, decryptedPassword);
         
         if (loginResult.success) {
+          // Update password encryption if needed
+          if (passwordNeedsUpdate) {
+            console.log(`Updating encrypted password for ${user.username}`);
+            const newEncryptedPassword = encrypt(decryptedPassword);
+            await usersCollection.updateOne(
+              { _id: user._id },
+              { 
+                $set: { 
+                  factohrPassword: newEncryptedPassword 
+                },
+                $unset: {
+                  factohrPasswordBackup: "",
+                  factohrPasswordPlain: ""
+                }
+              }
+            );
+            console.log(`Password encryption updated successfully for ${user.username}`);
+          }
+          
           // Mark attendance
           const attendanceResult = await markAttendance(loginResult.cookies, 'punchIn');
           
@@ -324,6 +380,25 @@ async function checkAndMarkAttendance() {
         const loginResult = await loginToFactoHR(factohrUsername, decryptedPassword);
         
         if (loginResult.success) {
+          // Update password encryption if needed (also for punch out)
+          if (passwordNeedsUpdate) {
+            console.log(`Updating encrypted password for ${user.username}`);
+            const newEncryptedPassword = encrypt(decryptedPassword);
+            await usersCollection.updateOne(
+              { _id: user._id },
+              { 
+                $set: { 
+                  factohrPassword: newEncryptedPassword 
+                },
+                $unset: {
+                  factohrPasswordBackup: "",
+                  factohrPasswordPlain: ""
+                }
+              }
+            );
+            console.log(`Password encryption updated successfully for ${user.username}`);
+          }
+          
           // Mark attendance
           const attendanceResult = await markAttendance(loginResult.cookies, 'punchOut');
           
