@@ -245,42 +245,18 @@ async function checkAndMarkAttendance() {
       }
       
       let decryptedPassword;
-      let passwordNeedsUpdate = false;
       
       try {
         decryptedPassword = decrypt(factohrPassword);
         if (decryptedPassword === factohrPassword) {
           console.log(`Warning: Password for ${user.username} might not be encrypted or decryption failed`);
+          console.error(`Cannot process ${user.username}: Password appears to be plain text or corrupted. Please update the password using update-user-password.js script.`);
+          continue;
         }
       } catch (error) {
         console.error(`Failed to decrypt password for ${user.username}:`, error.message);
-        
-        // Check if we have a plaintext password backup field
-        if (user.factohrPasswordBackup) {
-          console.log(`Using backup password for ${user.username}`);
-          decryptedPassword = user.factohrPasswordBackup;
-          passwordNeedsUpdate = true;
-        } else if (user.factohrPasswordPlain) {
-          // Legacy field name
-          console.log(`Using plain password for ${user.username}`);
-          decryptedPassword = user.factohrPasswordPlain;
-          passwordNeedsUpdate = true;
-        } else {
-          // Try known passwords based on username patterns
-          const knownPasswords = {
-            '104307': '751995751995',  // Common pattern for this user
-            '105928': '751995751995'   // Common pattern
-          };
-          
-          if (knownPasswords[user.username]) {
-            console.log(`Attempting known password pattern for ${user.username}`);
-            decryptedPassword = knownPasswords[user.username];
-            passwordNeedsUpdate = true;
-          } else {
-            console.error(`No recovery method available for ${user.username}. Skipping.`);
-            continue;
-          }
-        }
+        console.error(`Cannot process ${user.username}: Password encryption is corrupted. Please update the password using: node scripts/update-user-password.js ${user.username} <password>`);
+        continue;
       }
       
       // Process punch in
@@ -305,25 +281,6 @@ async function checkAndMarkAttendance() {
         const loginResult = await loginToFactoHR(factohrUsername, decryptedPassword);
         
         if (loginResult.success) {
-          // Update password encryption if needed
-          if (passwordNeedsUpdate) {
-            console.log(`Updating encrypted password for ${user.username}`);
-            const newEncryptedPassword = encrypt(decryptedPassword);
-            await usersCollection.updateOne(
-              { _id: user._id },
-              { 
-                $set: { 
-                  factohrPassword: newEncryptedPassword 
-                },
-                $unset: {
-                  factohrPasswordBackup: "",
-                  factohrPasswordPlain: ""
-                }
-              }
-            );
-            console.log(`Password encryption updated successfully for ${user.username}`);
-          }
-          
           // Mark attendance
           const attendanceResult = await markAttendance(loginResult.cookies, 'punchIn');
           
@@ -370,7 +327,7 @@ async function checkAndMarkAttendance() {
       // Force punch out if FORCE_PUNCH_OUT env var is set (for testing)
       const forcePunchOut = process.env.FORCE_PUNCH_OUT === 'true';
       
-      if (todayLog?.punchIn && !todayLog?.punchOut &&
+      if (!todayLog?.punchOut &&
           (forcePunchOut || (currentTime >= punchOutTimeMinutes - punchOutWindow && 
           currentTime <= punchOutTimeMinutes + punchOutWindow))) {
         
@@ -380,39 +337,39 @@ async function checkAndMarkAttendance() {
         const loginResult = await loginToFactoHR(factohrUsername, decryptedPassword);
         
         if (loginResult.success) {
-          // Update password encryption if needed (also for punch out)
-          if (passwordNeedsUpdate) {
-            console.log(`Updating encrypted password for ${user.username}`);
-            const newEncryptedPassword = encrypt(decryptedPassword);
-            await usersCollection.updateOne(
-              { _id: user._id },
-              { 
-                $set: { 
-                  factohrPassword: newEncryptedPassword 
-                },
-                $unset: {
-                  factohrPasswordBackup: "",
-                  factohrPasswordPlain: ""
-                }
-              }
-            );
-            console.log(`Password encryption updated successfully for ${user.username}`);
-          }
-          
           // Mark attendance
           const attendanceResult = await markAttendance(loginResult.cookies, 'punchOut');
           
           // Update database
-          await usersCollection.updateOne(
-            { _id: user._id, 'attendanceLogs.date': todayStart },
-            {
-              $set: {
-                'attendanceLogs.$.punchOut': new Date(),
-                'attendanceLogs.$.status': attendanceResult.success ? 'success' : 'failed',
-                'attendanceLogs.$.message': attendanceResult.success ? 'Punched out successfully' : attendanceResult.error,
+          if (todayLog) {
+            // Update existing log
+            await usersCollection.updateOne(
+              { _id: user._id, 'attendanceLogs.date': todayStart },
+              {
+                $set: {
+                  'attendanceLogs.$.punchOut': new Date(),
+                  'attendanceLogs.$.status': attendanceResult.success ? 'success' : 'failed',
+                  'attendanceLogs.$.message': attendanceResult.success ? 'Punched out successfully' : attendanceResult.error,
+                }
               }
-            }
-          );
+            );
+          } else {
+            // Create new log with only punch-out
+            await usersCollection.updateOne(
+              { _id: user._id },
+              {
+                $push: {
+                  attendanceLogs: {
+                    date: todayStart,
+                    punchIn: null,
+                    punchOut: new Date(),
+                    status: attendanceResult.success ? 'success' : 'failed',
+                    message: attendanceResult.success ? 'Punched out successfully (no punch-in record)' : attendanceResult.error,
+                  }
+                }
+              }
+            );
+          }
           
           processed++;
         }
