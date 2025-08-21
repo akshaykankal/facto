@@ -4,13 +4,26 @@
 
 echo "Setting up environment variables..."
 
-# Add environment variables
-echo "mongodb+srv://akshaykankal:KcYopRgVXHA00782@cluster0.hfaf2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" | vercel env add MONGODB_URI production
-echo "FACTOHR" | vercel env add DB_NAME production
-echo "your-jwt-secret-key-change-in-production" | vercel env add JWT_SECRET production
-echo "https://factohr-automation.vercel.app" | vercel env add NEXTAUTH_URL production
-echo "your-nextauth-secret-change-in-production" | vercel env add NEXTAUTH_SECRET production
-echo "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6" | vercel env add ENCRYPTION_KEY production
+# IMPORTANT: Set these environment variables before running this script
+# export MONGODB_URI="your-mongodb-uri"
+# export DB_NAME="your-database-name"
+# export JWT_SECRET="your-jwt-secret"
+# export NEXTAUTH_URL="your-app-url"
+# export NEXTAUTH_SECRET="your-nextauth-secret"
+# export ENCRYPTION_KEY="your-encryption-key"
+
+if [ -z "$MONGODB_URI" ]; then
+    echo "Error: MONGODB_URI environment variable is not set"
+    exit 1
+fi
+
+# Add environment variables from environment
+echo "$MONGODB_URI" | vercel env add MONGODB_URI production
+echo "${DB_NAME:-FACTOHR}" | vercel env add DB_NAME production
+echo "${JWT_SECRET:-change-in-production}" | vercel env add JWT_SECRET production
+echo "${NEXTAUTH_URL:-https://factohr-automation.vercel.app}" | vercel env add NEXTAUTH_URL production
+echo "${NEXTAUTH_SECRET:-change-in-production}" | vercel env add NEXTAUTH_SECRET production
+echo "${ENCRYPTION_KEY:-change-in-production}" | vercel env add ENCRYPTION_KEY production
 
 echo "Deploying to production..."
 vercel --prod --yes

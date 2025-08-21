@@ -16,9 +16,9 @@ Go to: GitHub Repo → Settings → Secrets and variables → Actions → New re
 
 Add these three secrets:
 ```
-MONGODB_URI = mongodb+srv://akshaykankal:KcYopRgVXHA00782@cluster0.hfaf2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+MONGODB_URI = <your-mongodb-connection-string>
 DB_NAME = FACTOHR
-ENCRYPTION_KEY = a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6
+ENCRYPTION_KEY = <generate-a-secure-32-character-key>
 ```
 
 ### 2. Commit and Push
