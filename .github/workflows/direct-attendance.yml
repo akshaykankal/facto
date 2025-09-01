@@ -1,0 +1,41 @@
+name: Direct Attendance Check
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  check-attendance:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: |
+        npm install mongodb
+        npm install axios
+        npm install dotenv
+    
+    - name: Debug MongoDB Connection
+      env:
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+      run: |
+        node scripts/debug-mongodb.js --github
+    
+    - name: Run attendance check
+      env:
+        MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        DB_NAME: ${{ secrets.DB_NAME }}
+        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+      run: |
+        node scripts/direct-attendance-check.js

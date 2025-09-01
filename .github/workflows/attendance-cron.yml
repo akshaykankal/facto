@@ -1,0 +1,43 @@
+name: Check Attendance
+
+on:
+  schedule:
+    # Runs every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  check-attendance:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check Attendance
+      run: |
+        # Use the latest deployment URL
+        APP_URL="${{ secrets.APP_URL || 'https://factohr-automation-cbondvr6j-akshaykankals-projects.vercel.app' }}"
+        CRON_SECRET="${{ secrets.CRON_SECRET || 'your-cron-secret-change-in-production' }}"
+        
+        echo "Calling attendance check endpoint..."
+        
+        response=$(curl -X GET "${APP_URL}/api/attendance/check" \
+          -H "Content-Type: application/json" \
+          -H "x-cron-secret: ${CRON_SECRET}" \
+          --location \
+          --silent \
+          --show-error \
+          -w "\nHTTP_STATUS:%{http_code}")
+        
+        http_status=$(echo "$response" | tail -n1 | cut -d: -f2)
+        body=$(echo "$response" | sed '$d')
+        
+        echo "Response: $body"
+        echo "Status: $http_status"
+        
+        if [ "$http_status" -ne 200 ]; then
+          echo "Error: HTTP status $http_status"
+          exit 1
+        fi
+    
+    - name: Log Result
+      if: always()
+      run: echo "Attendance check completed at $(date)"

@@ -1,0 +1,27 @@
+{
+  "functions": {
+    "app/api/scheduler/route.ts": {
+      "maxDuration": 10
+    },
+    "app/api/attendance/check/route.ts": {
+      "maxDuration": 10
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/internal/trigger",
+      "schedule": "30 3 * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/attendance/check",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    }
+  ]
+}

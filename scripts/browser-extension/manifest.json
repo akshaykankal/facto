@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "FactoHR Auto Attendance",
+  "version": "1.0",
+  "description": "Automatically checks FactoHR attendance every 15 minutes",
+  "permissions": [
+    "alarms",
+    "storage",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://factohr-automation-cbondvr6j-akshaykankals-projects.vercel.app/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon-16.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://factohr-automation-cbondvr6j-akshaykankals-projects.vercel.app/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
