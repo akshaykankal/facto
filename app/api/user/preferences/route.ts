@@ -13,12 +13,15 @@ export async function GET(request: NextRequest) {
     const payload = verifyToken(token)
     await dbConnect()
 
-    const user = await User.findById(payload.userId).select('preferences')
+    const user = await User.findById(payload.userId).select('preferences factohrUsername')
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ preferences: user.preferences })
+    return NextResponse.json({
+      preferences: user.preferences,
+      factohrUsername: user.factohrUsername
+    })
   } catch (error: any) {
     console.error('Get preferences error:', error)
     return NextResponse.json(
@@ -37,22 +40,37 @@ export async function PUT(request: NextRequest) {
 
     const payload = verifyToken(token)
     const body = await request.json()
-    
+
     await dbConnect()
 
-    const user = await User.findByIdAndUpdate(
-      payload.userId,
-      { preferences: body },
-      { new: true, runValidators: true }
-    ).select('preferences')
-
+    // Find the user
+    const user = await User.findById(payload.userId)
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
+    // Update preferences (excluding factohrUsername and factohrPassword)
+    const { factohrUsername, factohrPassword, ...preferences } = body
+    user.preferences = preferences
+
+    // Update FactoHR credentials if provided
+    if (factohrUsername && factohrUsername.trim() !== '') {
+      user.factohrUsername = factohrUsername.trim()
+    }
+
+    // Only update password if a new one is provided
+    if (factohrPassword && factohrPassword.trim() !== '') {
+      user.factohrPassword = factohrPassword.trim()
+      // The pre-save hook will automatically encrypt this
+    }
+
+    // Save the user (this triggers pre-save hooks for encryption)
+    await user.save()
+
     return NextResponse.json({
       message: 'Preferences updated successfully',
-      preferences: user.preferences
+      preferences: user.preferences,
+      factohrUsername: user.factohrUsername
     })
   } catch (error: any) {
     console.error('Update preferences error:', error)
