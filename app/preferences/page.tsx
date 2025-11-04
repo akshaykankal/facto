@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 interface PreferencesForm {
+  factohrUsername: string
+  factohrPassword: string
   punchInTime: string
   punchOutTime: string
   randomMinutes: number
@@ -15,6 +17,8 @@ interface PreferencesForm {
 export default function Preferences() {
   const router = useRouter()
   const [formData, setFormData] = useState<PreferencesForm>({
+    factohrUsername: '',
+    factohrPassword: '',
     punchInTime: '09:00',
     punchOutTime: '18:00',
     randomMinutes: 15,
@@ -54,8 +58,10 @@ export default function Preferences() {
 
       const data = await response.json()
       setFormData({
+        factohrUsername: data.factohrUsername || '',
+        factohrPassword: '', // Never populate password from server for security
         ...data.preferences,
-        leaveDates: data.preferences.leaveDates.map((date: string) => 
+        leaveDates: data.preferences.leaveDates.map((date: string) =>
           new Date(date).toISOString().split('T')[0]
         ),
       })
@@ -148,6 +154,47 @@ export default function Preferences() {
       <main className="max-w-3xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 space-y-6">
+            <div className="border-b border-gray-200 pb-6 mb-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">FactoHR Credentials</h3>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="factohrUsername" className="block text-sm font-medium text-gray-700">
+                    FactoHR Username
+                  </label>
+                  <input
+                    type="text"
+                    id="factohrUsername"
+                    value={formData.factohrUsername}
+                    onChange={(e) => setFormData({ ...formData, factohrUsername: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+                    required
+                  />
+                  <p className="mt-1 text-sm text-gray-500">
+                    Your FactoHR login username
+                  </p>
+                </div>
+
+                <div>
+                  <label htmlFor="factohrPassword" className="block text-sm font-medium text-gray-700">
+                    FactoHR Password
+                  </label>
+                  <input
+                    type="password"
+                    id="factohrPassword"
+                    value={formData.factohrPassword}
+                    onChange={(e) => setFormData({ ...formData, factohrPassword: e.target.value })}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-3 py-2 border"
+                    placeholder="Enter new password to update"
+                  />
+                  <p className="mt-1 text-sm text-gray-500">
+                    Leave blank to keep current password. Your password is encrypted and stored securely.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <h3 className="text-lg font-medium text-gray-900">Attendance Schedule</h3>
+
             <div>
               <label htmlFor="punchInTime" className="block text-sm font-medium text-gray-700">
                 Punch In Time
