@@ -1,16 +1,5 @@
 import mongoose from 'mongoose'
 
-const MONGODB_URI = process.env.MONGODB_URI!
-const DB_NAME = process.env.DB_NAME!
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable')
-}
-
-if (!DB_NAME) {
-  throw new Error('Please define the DB_NAME environment variable')
-}
-
 let cached = global as any
 
 if (!cached.mongoose) {
@@ -18,6 +7,19 @@ if (!cached.mongoose) {
 }
 
 async function dbConnect() {
+  // Check environment variables at runtime, not at module import time
+  // This prevents build failures when env vars aren't available during Next.js build
+  const MONGODB_URI = process.env.MONGODB_URI
+  const DB_NAME = process.env.DB_NAME
+
+  if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable')
+  }
+
+  if (!DB_NAME) {
+    throw new Error('Please define the DB_NAME environment variable')
+  }
+
   if (cached.mongoose.conn) {
     return cached.mongoose.conn
   }
