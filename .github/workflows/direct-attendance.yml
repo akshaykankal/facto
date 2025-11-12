@@ -12,20 +12,42 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
+        cache: 'npm'
     
     - name: Install dependencies
       run: |
-        npm install mongodb
-        npm install axios
-        npm install dotenv
-    
+        # Use npm ci for faster, reliable installs in CI
+        if [ -f package-lock.json ]; then
+          npm ci
+        else
+          npm install
+        fi
+
+    - name: Verify environment variables
+      run: |
+        echo "Checking required environment variables..."
+        if [ -z "${{ secrets.MONGODB_URI }}" ]; then
+          echo "❌ ERROR: MONGODB_URI secret is not set"
+          exit 1
+        fi
+        if [ -z "${{ secrets.DB_NAME }}" ]; then
+          echo "❌ ERROR: DB_NAME secret is not set"
+          exit 1
+        fi
+        if [ -z "${{ secrets.ENCRYPTION_KEY }}" ]; then
+          echo "❌ ERROR: ENCRYPTION_KEY secret is not set"
+          exit 1
+        fi
+        echo "✅ All required environment variables are set"
+
     - name: Debug MongoDB Connection
+      continue-on-error: true
       env:
         MONGODB_URI: ${{ secrets.MONGODB_URI }}
         DB_NAME: ${{ secrets.DB_NAME }}
@@ -38,4 +60,11 @@ jobs:
         DB_NAME: ${{ secrets.DB_NAME }}
         ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       run: |
+        echo "Starting attendance check..."
         node scripts/direct-attendance-check.js
+        EXIT_CODE=$?
+        if [ $EXIT_CODE -ne 0 ]; then
+          echo "❌ Attendance check failed with exit code $EXIT_CODE"
+          exit $EXIT_CODE
+        fi
+        echo "✅ Attendance check completed successfully"
